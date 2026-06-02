@@ -310,10 +310,6 @@ body::before{
         <div class="h-stat-lbl">NP 目标</div>
         <div class="h-stat-val">50,000 bags / 车型</div>
       </div>
-      <div>
-        <div class="h-stat-lbl">D2D 目标</div>
-        <div class="h-stat-val">20,000 bags / 车型</div>
-      </div>
       <div class="live-chip"><span class="live-dot"></span>数据看板</div>
     </div>
   </div>
@@ -410,18 +406,15 @@ function render() {
   document.getElementById('update-ts').textContent  = LAST_UPDATED;
 
   // Totals
-  let tNPcol=0, tNPdct=0, tD2Dcol=0, tD2Ddct=0;
+  let tNPcol=0, tNPdct=0;
   PLATFORMS.forEach(p => p.vehicles.forEach(v => {
-    tNPcol  += v.np.col;  tNPdct  += v.np.dct;
-    tD2Dcol += v.d2d.col; tD2Ddct += v.d2d.dct;
+    tNPcol += v.np.col; tNPdct += v.np.dct;
   }));
 
   document.getElementById('totals-bar').innerHTML = [
-    ['NP 总采集',      fmt(tNPcol),  'bags · 全平台合计'],
-    ['NP Auto-DCT 后', fmt(tNPdct),  'bags · 全平台合计'],
-    ['D2D 总采集',     fmt(tD2Dcol), 'bags · 全平台合计'],
-    ['D2D Auto-DCT 后',fmt(tD2Ddct), 'bags · 全平台合计'],
-  ].map(([lbl, val, sub]) => `
+    ['NP 总采集',      fmt(tNPcol), 'bags · 全平台合计'],
+    ['NP Auto-DCT 后', fmt(tNPdct), 'bags · 全平台合计'],
+  ].map(([lbl, val]) => `
     <div class="tot-stat">
       <div class="tot-val">${val}</div>
       <div class="tot-lbl">${lbl}</div>
@@ -431,8 +424,8 @@ function render() {
   // Platforms
   const main = document.getElementById('main');
   PLATFORMS.forEach(platform => {
-    let pNPcol=0, pD2Dcol=0;
-    platform.vehicles.forEach(v => { pNPcol += v.np.col; pD2Dcol += v.d2d.col; });
+    let pNPcol=0;
+    platform.vehicles.forEach(v => { pNPcol += v.np.col; });
 
     const sec = document.createElement('section');
     sec.className = `plat-section ${platform.id}`;
@@ -444,7 +437,7 @@ function render() {
           <div class="plat-sub">${platform.vehicles.length} 个车型</div>
         </div>
         <div class="plat-line"></div>
-        <div class="plat-meta">NP 总采集 ${fmt(pNPcol)} &nbsp;·&nbsp; D2D 总采集 ${fmt(pD2Dcol)}</div>
+        <div class="plat-meta">NP 总采集 ${fmt(pNPcol)}</div>
       </div>
       <div class="v-grid" id="grid-${platform.id}"></div>
     `;
@@ -453,9 +446,8 @@ function render() {
     const grid = sec.querySelector(`#grid-${platform.id}`);
 
     platform.vehicles.forEach((v, i) => {
-      const npP  = pct(v.np.dct,  NP_TARGET);
-      const d2dP = pct(v.d2d.dct, D2D_TARGET);
-      const [stLabel, stClass] = statusBadge(npP, d2dP);
+      const npP  = pct(v.np.dct, NP_TARGET);
+      const [stLabel, stClass] = statusBadge(npP, npP);
 
       const card = document.createElement('div');
       card.className = 'v-card';
@@ -469,7 +461,6 @@ function render() {
           </div>
           <div class="v-tags">
             <span class="v-tag tag-np">NP</span>
-            <span class="v-tag tag-d2d">D2D</span>
           </div>
         </div>
         <div class="v-body">
@@ -501,35 +492,6 @@ function render() {
             </div>
             <div class="prog-track">
               <div class="prog-fill" data-w="${npP}"></div>
-            </div>
-          </div>
-
-          <!-- D2D -->
-          <div class="feat feat-d2d">
-            <div class="feat-hd">
-              <div class="feat-lbl">
-                <span class="feat-badge">D2D</span>
-              </div>
-              <div class="feat-target">目标 <b>${fmt(D2D_TARGET)}</b> bags</div>
-            </div>
-            <div class="metrics">
-              <div class="metric met-col">
-                <div class="met-lbl">采集数据</div>
-                <div class="met-val">${fmt(v.d2d.col)}</div>
-                <div class="met-sub">bags</div>
-              </div>
-              <div class="metric met-dct">
-                <div class="met-lbl">Auto-DCT 后</div>
-                <div class="met-val">${fmt(v.d2d.dct)}</div>
-                <div class="met-sub">${passRate(v.d2d.dct, v.d2d.col)}</div>
-              </div>
-            </div>
-            <div class="prog-hd">
-              <span class="prog-lbl">采集进度 &nbsp;${fmt(v.d2d.dct)} / ${fmt(D2D_TARGET)}</span>
-              <span class="prog-pct ${pctClass(d2dP)}">${pctFmt(d2dP)}</span>
-            </div>
-            <div class="prog-track">
-              <div class="prog-fill" data-w="${d2dP}"></div>
             </div>
           </div>
 
