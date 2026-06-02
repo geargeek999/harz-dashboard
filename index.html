@@ -4,6 +4,41 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Harz R7 Expert Data Collection Dashboard</title>
+<script>
+(function(){
+  var PASS = "pangu";
+  var ok = sessionStorage.getItem("harz_auth") === "1";
+  if (!ok) {
+    document.addEventListener("DOMContentLoaded", function(){
+      document.body.style.display = "none";
+      var overlay = document.createElement("div");
+      overlay.style.cssText = "position:fixed;inset:0;background:#f0f4fa;display:flex;align-items:center;justify-content:center;z-index:9999;";
+      overlay.innerHTML = '<div style="background:#fff;border-radius:16px;padding:40px 48px;box-shadow:0 8px 32px rgba(0,0,0,.12);text-align:center;min-width:320px;">'
+        + '<div style="font-size:28px;font-weight:700;color:#1e2a3a;margin-bottom:8px;">Harz R7 Dashboard</div>'
+        + '<div style="color:#5a6a85;margin-bottom:28px;">请输入访问密码</div>'
+        + '<input id="pw" type="password" placeholder="Password" style="width:100%;padding:12px 16px;border:1.5px solid #dde4ef;border-radius:8px;font-size:15px;outline:none;box-sizing:border-box;margin-bottom:12px;" />'
+        + '<div id="err" style="color:#ef4444;font-size:13px;margin-bottom:10px;min-height:18px;"></div>'
+        + '<button id="btn" style="width:100%;padding:12px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;">进入</button>'
+        + '</div>';
+      document.body.parentNode.insertBefore(overlay, document.body);
+      function tryLogin(){
+        if(document.getElementById("pw").value === PASS){
+          sessionStorage.setItem("harz_auth","1");
+          overlay.remove();
+          document.body.style.display = "";
+        } else {
+          document.getElementById("err").textContent = "密码错误，请重试";
+          document.getElementById("pw").value = "";
+          document.getElementById("pw").focus();
+        }
+      }
+      document.getElementById("btn").addEventListener("click", tryLogin);
+      document.getElementById("pw").addEventListener("keydown", function(e){ if(e.key==="Enter") tryLogin(); });
+      document.getElementById("pw").focus();
+    });
+  }
+})();
+</script>
 <style>
 :root {
   --bg:        #f0f4fa;
