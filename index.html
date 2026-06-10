@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Harz R7 Expert Data Collection Dashboard</title>
+<title>副驾DCT数据看板</title>
 <script>
 (function(){
   var PASS = "pangu";
-  var ok = sessionStorage.getItem("harz_auth") === "1" || location.hostname === "10.21.163.195";
+  var ok = sessionStorage.getItem("dct_auth") === "1" || location.hostname === "10.21.163.195";
   if (!ok) {
     document.addEventListener("DOMContentLoaded", function(){
       document.body.style.display = "none";
       var overlay = document.createElement("div");
       overlay.style.cssText = "position:fixed;inset:0;background:#f0f4fa;display:flex;align-items:center;justify-content:center;z-index:9999;";
       overlay.innerHTML = '<div style="background:#fff;border-radius:16px;padding:40px 48px;box-shadow:0 8px 32px rgba(0,0,0,.12);text-align:center;min-width:320px;">'
-        + '<div style="font-size:28px;font-weight:700;color:#1e2a3a;margin-bottom:8px;">Harz R7 Dashboard</div>'
+        + '<div style="font-size:28px;font-weight:700;color:#1e2a3a;margin-bottom:8px;">副驾DCT数据看板</div>'
         + '<div style="color:#5a6a85;margin-bottom:28px;">请输入访问密码</div>'
         + '<input id="pw" type="password" placeholder="Password" style="width:100%;padding:12px 16px;border:1.5px solid #dde4ef;border-radius:8px;font-size:15px;outline:none;box-sizing:border-box;margin-bottom:12px;" />'
         + '<div id="err" style="color:#ef4444;font-size:13px;margin-bottom:10px;min-height:18px;"></div>'
@@ -23,7 +23,7 @@
       document.body.parentNode.insertBefore(overlay, document.body);
       function tryLogin(){
         if(document.getElementById("pw").value === PASS){
-          sessionStorage.setItem("harz_auth","1");
+          sessionStorage.setItem("dct_auth","1");
           overlay.remove();
           document.body.style.display = "";
         } else {
@@ -40,478 +40,169 @@
 })();
 </script>
 <style>
-:root {
-  --bg:        #f0f4fa;
-  --bg2:       #e8eef8;
-  --white:     #ffffff;
-  --border:    #dde4ef;
-  --border-h:  #c5d0e8;
-  --text-1:    #1e2a3a;
-  --text-2:    #5a6a85;
-  --text-3:    #94a3b8;
-  --blue:      #2563eb;
-  --blue-lt:   #eff6ff;
-  --blue-mid:  #bfdbfe;
-  --purple:    #7c3aed;
-  --purple-lt: #f5f3ff;
-  --purple-mid:#ddd6fe;
-  --green:     #059669;
-  --green-lt:  #f0fdf4;
-  --green-mid: #bbf7d0;
-  --amber:     #d97706;
-  --amber-lt:  #fffbeb;
-  --red:       #dc2626;
-  --blue-g:    linear-gradient(135deg,#1d4ed8,#3b82f6);
-  --green-g:   linear-gradient(135deg,#047857,#10b981);
-  --shadow-sm: 0 1px 4px rgba(37,99,235,.06),0 1px 2px rgba(0,0,0,.05);
-  --shadow-md: 0 4px 16px rgba(37,99,235,.08),0 2px 6px rgba(0,0,0,.06);
-  --shadow-lg: 0 12px 36px rgba(37,99,235,.12),0 4px 12px rgba(0,0,0,.08);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-  font-family:-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Segoe UI',sans-serif;
-  background:var(--bg);
-  color:var(--text-1);
-  min-height:100vh;
-  overflow-x:hidden;
-  line-height:1.5;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0d1117; color: #e6edf3; min-height: 100vh; }
 
-/* ── subtle dot grid ── */
-body::before{
-  content:'';
-  position:fixed;inset:0;
-  background-image:radial-gradient(circle,#c8d8f0 1px,transparent 1px);
-  background-size:28px 28px;
-  opacity:.45;
-  pointer-events:none;z-index:0;
+/* ── header ── */
+.header {
+  background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+  border-bottom: 1px solid #21262d;
+  padding: 18px 32px;
+  display: flex; align-items: center; justify-content: space-between;
 }
-.z1{position:relative;z-index:1}
-.grid-bg{display:none}   /* not needed in light mode */
+.header-title { font-size: 20px; font-weight: 700; color: #58a6ff; }
+.header-sub { font-size: 13px; color: #8b949e; margin-top: 3px; }
+.header-updated { font-size: 12px; color: #8b949e; }
 
-/* ━━━━━━━━━━━━ HEADER ━━━━━━━━━━━━ */
-.header{
-  background:var(--white);
-  border-bottom:1px solid var(--border);
-  box-shadow:0 1px 6px rgba(37,99,235,.07);
-  position:sticky;top:0;z-index:50;
+/* ── summary cards ── */
+.cards { display: flex; gap: 20px; padding: 24px 32px 0; }
+.card {
+  flex: 1; background: #161b22; border: 1px solid #21262d;
+  border-radius: 12px; padding: 20px 24px;
 }
-.header-inner{
-  max-width:1700px;margin:0 auto;
-  padding:0 40px;height:68px;
-  display:flex;align-items:center;justify-content:space-between;gap:24px;
-}
-.header-left{display:flex;align-items:center;gap:18px}
-.proj-chip{
-  background:var(--blue-g);
-  color:#fff;font-size:12px;font-weight:800;
-  letter-spacing:2px;padding:5px 14px;border-radius:20px;
-  text-transform:uppercase;white-space:nowrap;
-  box-shadow:0 2px 8px rgba(37,99,235,.35);
-}
-.h-title{
-  font-size:20px;font-weight:700;color:var(--text-1);
-}
-.h-sub{font-size:11px;color:var(--text-2);margin-top:1px}
-.header-right{display:flex;align-items:center;gap:28px}
-.h-stat-lbl{font-size:10px;color:var(--text-3);letter-spacing:.8px;text-transform:uppercase}
-.h-stat-val{font-size:13px;font-weight:600;color:var(--text-1);margin-top:2px}
-.live-chip{
-  display:flex;align-items:center;gap:7px;
-  font-size:12px;color:var(--green);
-  padding:4px 12px;border-radius:20px;
-  border:1px solid #a7f3d0;background:#f0fdf4;
-}
-.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);
-  animation:blink 2s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+.card-title { font-size: 13px; color: #8b949e; margin-bottom: 14px; font-weight: 600; letter-spacing: .4px; }
+.card-nums { display: flex; gap: 24px; margin-bottom: 14px; }
+.card-num-item { text-align: center; }
+.card-num-label { font-size: 11px; color: #8b949e; margin-bottom: 4px; }
+.num-vg   { font-size: 26px; font-weight: 700; color: #3fb950; }
+.num-good { font-size: 26px; font-weight: 700; color: #58a6ff; }
+.num-bad  { font-size: 26px; font-weight: 700; color: #f85149; }
+.bar-wrap { height: 8px; background: #21262d; border-radius: 4px; overflow: hidden; display: flex; }
+.bar-vg   { background: #3fb950; }
+.bar-good { background: #58a6ff; }
+.bar-bad  { background: #f85149; }
+.bar-legend { font-size: 11px; color: #8b949e; margin-top: 6px; }
 
-/* ━━━━━━━━━━━━ TOTALS BAR ━━━━━━━━━━━━ */
-.totals-bar{
-  border-bottom:1px solid var(--border);
-  background:linear-gradient(135deg,#e8f0fe 0%,#f5f3ff 50%,#e8f5e9 100%);
+/* ── route table ── */
+.section { padding: 24px 32px 32px; }
+.section-title {
+  font-size: 15px; font-weight: 700; color: #e6edf3;
+  margin-bottom: 16px; padding-bottom: 10px;
+  border-bottom: 1px solid #21262d;
 }
-.totals-inner{
-  max-width:1700px;margin:0 auto;padding:20px 40px;
-  display:grid;grid-template-columns:repeat(4,1fr);
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th {
+  text-align: left; padding: 10px 12px;
+  color: #8b949e; font-weight: 600; font-size: 12px;
+  border-bottom: 1px solid #21262d; white-space: nowrap;
 }
-.tot-stat{text-align:center;border-right:1px solid var(--border);padding:0 20px}
-.tot-stat:last-child{border-right:none}
-.tot-val{
-  font-size:28px;font-weight:900;letter-spacing:-1px;
-  background:linear-gradient(135deg,var(--blue),var(--purple));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+tbody tr { border-bottom: 1px solid #161b22; }
+tbody tr:hover { background: #161b22; }
+tbody td { padding: 10px 12px; vertical-align: middle; }
+.td-route { font-weight: 600; color: #58a6ff; max-width: 260px; word-break: break-all; }
+.td-num { text-align: right; color: #e6edf3; }
+.td-good { text-align: right; color: #3fb950; font-weight: 600; }
+.td-models { display: flex; flex-wrap: wrap; gap: 5px; }
+.model-tag {
+  background: #21262d; border: 1px solid #30363d;
+  border-radius: 6px; padding: 2px 8px;
+  font-size: 11px; color: #8b949e; white-space: nowrap;
 }
-.tot-lbl{font-size:11px;color:var(--text-2);margin-top:4px}
-
-/* ━━━━━━━━━━━━ MAIN ━━━━━━━━━━━━ */
-.main{max-width:1700px;margin:0 auto;padding:48px 40px}
-
-/* ━━━━━━━━━━━━ PLATFORM SECTION ━━━━━━━━━━━━ */
-.plat-section{margin-bottom:72px}
-.plat-heading{display:flex;align-items:center;gap:18px;margin-bottom:28px}
-.plat-icon{
-  width:44px;height:44px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:900;letter-spacing:-.5px;flex-shrink:0;
-  box-shadow:var(--shadow-sm);
-}
-.st35 .plat-icon{background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:var(--blue);border:1px solid #93c5fd}
-.st3  .plat-icon{background:linear-gradient(135deg,#ede9fe,#ddd6fe);color:var(--purple);border:1px solid #c4b5fd}
-.plat-title{font-size:22px;font-weight:800;letter-spacing:.2px}
-.st35 .plat-title{color:var(--blue)}
-.st3  .plat-title{color:var(--purple)}
-.plat-sub{font-size:12px;color:var(--text-2);margin-top:1px}
-.plat-line{flex:1;height:1px}
-.st35 .plat-line{background:linear-gradient(90deg,#93c5fd,transparent)}
-.st3  .plat-line{background:linear-gradient(90deg,#c4b5fd,transparent)}
-.plat-meta{font-size:12px;color:var(--text-2);white-space:nowrap;
-  background:var(--white);padding:4px 14px;border-radius:20px;border:1px solid var(--border)}
-
-/* ━━━━━━━━━━━━ VEHICLE GRID ━━━━━━━━━━━━ */
-.v-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(370px,1fr));
-  gap:20px;
-}
-
-/* ━━━━━━━━━━━━ VEHICLE CARD ━━━━━━━━━━━━ */
-.v-card{
-  background:var(--white);
-  border:1px solid var(--border);
-  border-radius:20px;overflow:hidden;
-  box-shadow:var(--shadow-sm);
-  transition:all .25s ease;position:relative;
-  animation:fadeUp .5s ease both;
-}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.v-card:hover{
-  border-color:var(--border-h);
-  transform:translateY(-4px);
-  box-shadow:var(--shadow-lg);
-}
-/* top accent stripe */
-.v-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-}
-.st35 .v-card::before{background:linear-gradient(90deg,#3b82f6,#60a5fa,#93c5fd)}
-.st3  .v-card::before{background:linear-gradient(90deg,#7c3aed,#a78bfa,#c4b5fd)}
-
-/* card header */
-.v-head{
-  padding:18px 22px 14px;
-  display:flex;align-items:center;justify-content:space-between;
-  background:linear-gradient(135deg,#fafbff,#f8faff);
-  border-bottom:1px solid var(--border);
-}
-.v-model{font-size:20px;font-weight:900;letter-spacing:.3px;line-height:1}
-.st35 .v-model{color:#1d4ed8}
-.st3  .v-model{color:#6d28d9}
-.v-tags{display:flex;gap:6px}
-.v-tag{font-size:10px;font-weight:700;padding:3px 9px;border-radius:7px;letter-spacing:.5px}
-.tag-np{ background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd}
-.tag-d2d{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
-
-/* card body */
-.v-body{padding:16px 18px}
-
-/* status badge */
-.v-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;letter-spacing:.4px;margin-left:8px}
-.status-done   {background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
-.status-track  {background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
-.status-behind {background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
-.status-early  {background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
-
-/* ━━━━━━━━━━━━ FEATURE BLOCK ━━━━━━━━━━━━ */
-.feat{padding:13px 15px;border-radius:14px;margin-bottom:10px}
-.feat:last-child{margin-bottom:0}
-.feat-np {background:var(--blue-lt);border:1px solid var(--blue-mid)}
-.feat-d2d{background:var(--green-lt);border:1px solid var(--green-mid)}
-
-.feat-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.feat-lbl{display:flex;align-items:center;gap:8px}
-.feat-badge{font-size:11px;font-weight:800;padding:3px 10px;border-radius:6px;letter-spacing:.8px}
-.feat-np  .feat-badge{background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd}
-.feat-d2d .feat-badge{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
-.feat-desc{font-size:10px;color:var(--text-3)}
-.feat-target{font-size:11px;color:var(--text-2)}
-.feat-target b{color:var(--text-1);font-weight:700}
-
-/* metrics */
-.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.metric{background:var(--white);border-radius:10px;padding:11px 13px;
-  border:1px solid var(--border);position:relative;overflow:hidden;
-  box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.metric::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px}
-.feat-np  .met-col::before{background:var(--blue)}
-.feat-d2d .met-col::before{background:var(--green)}
-.met-dct::before{background:var(--amber)}
-.met-lbl{font-size:10px;color:var(--text-3);letter-spacing:.3px;text-transform:uppercase;margin-bottom:5px}
-.met-val{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
-.feat-np  .met-col .met-val{color:#1d4ed8}
-.feat-d2d .met-col .met-val{color:#065f46}
-.met-dct .met-val{color:var(--amber)}
-.met-sub{font-size:10px;color:var(--text-3);margin-top:3px}
-
-/* progress */
-.prog-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-.prog-lbl{font-size:10px;color:var(--text-2)}
-.prog-pct{font-size:13px;font-weight:700}
-.c-hi{color:#059669}.c-md{color:#d97706}.c-lo{color:#dc2626}
-
-.prog-track{height:7px;background:#e2e8f0;border-radius:4px;overflow:hidden;position:relative}
-.prog-fill{height:100%;border-radius:4px;width:0;
-  transition:width 1.4s cubic-bezier(.34,1.56,.64,1)}
-.feat-np  .prog-fill{background:var(--blue-g)}
-.feat-d2d .prog-fill{background:var(--green-g)}
-
-/* ━━━━━━━━━━━━ FOOTER ━━━━━━━━━━━━ */
-.footer{
-  text-align:center;padding:40px;
-  color:var(--text-3);font-size:12px;
-  border-top:1px solid var(--border);
-  background:var(--white);
-}
-
-/* ━━━━━━━━━━━━ RESPONSIVE ━━━━━━━━━━━━ */
-@media(max-width:900px){
-  .header-inner{padding:14px 20px;height:auto;flex-wrap:wrap}
-  .header-right{display:none}
-  .totals-inner{grid-template-columns:repeat(2,1fr);padding:14px 20px;gap:0}
-  .tot-stat{padding:10px 8px}
-  .main{padding:28px 16px}
-  .v-grid{grid-template-columns:1fr}
-  .plat-heading{flex-wrap:wrap}
-  .plat-line{display:none}
-}
+.model-tag .laps { color: #58a6ff; font-weight: 600; }
+.empty { color: #484f58; font-style: italic; }
 </style>
 </head>
 <body>
-<div class="grid-bg"></div>
-<div class="z1">
 
-<!-- ═══ HEADER ═══ -->
-<header class="header">
-  <div class="header-inner">
-    <div class="header-left">
-      <span class="proj-chip">HARZ</span>
-      <div>
-        <div class="h-title">R7 专家数据采集看板</div>
-        <div class="h-sub">Expert Data Collection Dashboard · Momenta</div>
-      </div>
-    </div>
-    <div class="header-right">
-      <div>
-        <div class="h-stat-lbl">统计周期</div>
-        <div class="h-stat-val">2026-01-01 ~ <span id="date-end">—</span></div>
-      </div>
-      <div>
-        <div class="h-stat-lbl">NP 目标</div>
-        <div class="h-stat-val">50,000 bags / 车型</div>
-      </div>
-      <div class="live-chip"><span class="live-dot"></span>数据看板</div>
-    </div>
+<div class="header">
+  <div>
+    <div class="header-title">副驾DCT数据看板</div>
+    <div class="header-sub">项目: Harz &nbsp;|&nbsp; 时间: 2026-06-01 → 今日 &nbsp;|&nbsp; 已准出</div>
   </div>
-</header>
-
-<!-- ═══ TOTALS BAR ═══ -->
-<div class="totals-bar">
-  <div class="totals-inner" id="totals-bar"></div>
+  <div class="header-updated" id="updated">—</div>
 </div>
 
-<!-- ═══ MAIN ═══ -->
-<main class="main" id="main"></main>
+<div class="cards">
+  <div class="card">
+    <div class="card-title">多人校准数据量（全车型汇总）</div>
+    <div class="card-nums">
+      <div class="card-num-item"><div class="card-num-label">Very Good</div><div class="num-vg" id="sc-vg">—</div></div>
+      <div class="card-num-item"><div class="card-num-label">Good</div><div class="num-good" id="sc-good">—</div></div>
+      <div class="card-num-item"><div class="card-num-label">Bad</div><div class="num-bad" id="sc-bad">—</div></div>
+    </div>
+    <div class="bar-wrap" id="sc-bar"></div>
+    <div class="bar-legend" id="sc-legend"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">训练可用数据量（全车型汇总）</div>
+    <div class="card-nums">
+      <div class="card-num-item"><div class="card-num-label">Very Good</div><div class="num-vg" id="dlp-vg">—</div></div>
+      <div class="card-num-item"><div class="card-num-label">Good</div><div class="num-good" id="dlp-good">—</div></div>
+      <div class="card-num-item"><div class="card-num-label">Bad</div><div class="num-bad" id="dlp-bad">—</div></div>
+    </div>
+    <div class="bar-wrap" id="dlp-bar"></div>
+    <div class="bar-legend" id="dlp-legend"></div>
+  </div>
+</div>
 
-<footer class="footer">
-  Momenta · Harz Project · R7 Expert Collection &nbsp;·&nbsp;
-  数据来源：FST Expert Import SPA &nbsp;·&nbsp;
-  更新时间：<span id="update-ts">—</span>
-</footer>
-
-</div><!-- .z1 -->
+<div class="section">
+  <div class="section-title">路线 Bag 统计 — 按路线汇总圈数与采集数量</div>
+  <table>
+    <thead>
+      <tr>
+        <th>路线名称</th>
+        <th style="text-align:right">圈数</th>
+        <th style="text-align:right">采集数量</th>
+        <th style="text-align:right">好数据量</th>
+        <th>各车型（圈数 / 车辆号）</th>
+      </tr>
+    </thead>
+    <tbody id="route-tbody"></tbody>
+  </table>
+</div>
 
 <script>
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   DATA CONFIG
-   ─────────────────────────────────────────────
-   Update numbers from:
-     https://fst.momenta.works/expert-import-spa/expert-data-spa?tab=fst-view
-   Project: Harz  |  Date: 2026-01-01 ~ today
+function fmt(n) { return n > 0 ? n.toLocaleString() : '—'; }
 
-   NP   → Product 筛选: UNP + HNP
-   D2D  → Product 筛选: D2D
-
-   collected = RAW "采集数据" 输出值
-   autoDCT   = ADP "Auto DCT" 输出值
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-const NP_TARGET  = 50000;
-const D2D_TARGET = 20000;
-
-const PLATFORMS = [
-  {
-    id: 'st35', name: 'ST35',
-    vehicles: [
-      { model: '449_A1p0'      , np: { col:  19752, dct:   6610 }, d2d: { col:      0, dct:      0 } },
-      { model: 'C590'          , np: { col:      0, dct:      0 }, d2d: { col:      0, dct:      0 } },
-      { model: 'V174'          , np: { col:  24071, dct:   7076 }, d2d: { col:  84589, dct:  20454 } },
-      { model: 'V178'          , np: { col:   6834, dct:   3240 }, d2d: { col:      0, dct:      0 } },
-      { model: 'V520'          , np: { col:   2002, dct:    633 }, d2d: { col:      0, dct:      0 } },
-      { model: 'V540'          , np: { col:  34112, dct:  12808 }, d2d: { col:  16292, dct:   1802 } },
-    ]
-  },
-  {
-    id: 'st3', name: 'ST3',
-    vehicles: [
-      { model: 'C167'          , np: { col:  10095, dct:   3157 }, d2d: { col:      0, dct:      0 } },
-      { model: 'T167'          , np: { col:  47916, dct:  15564 }, d2d: { col:      0, dct:      0 } },
-      { model: 'X167'          , np: { col:   5304, dct:   2068 }, d2d: { col:      0, dct:      0 } },
-      { model: 'X167_Maybach'  , np: { col:  13025, dct:   5590 }, d2d: { col:      0, dct:      0 } },
-      { model: 'V167'          , np: { col:  28815, dct:  12368 }, d2d: { col:      0, dct:      0 } },
-      { model: 'V223M'         , np: { col:  44669, dct:  16319 }, d2d: { col:      0, dct:      0 } },
-      { model: 'Z223M'         , np: { col:  49412, dct:  17744 }, d2d: { col:      0, dct:      0 } },
-      { model: 'V206M'         , np: { col:  57304, dct:  19903 }, d2d: { col:      0, dct:      0 } },
-    ]
-  }
-];  // last updated 2026-06-04
-const LAST_UPDATED = '2026-06-04 20:25:15';  // patched by update_harz_data.py
-
-/* ━━━━━━━━━━━━ helpers ━━━━━━━━━━━━ */
-const fmt   = n => n.toLocaleString('zh-CN');
-const pct   = (v, t) => Math.min(v / t * 100, 100);
-const pctFmt = p => p.toFixed(1) + '%';
-
-function pctClass(p) {
-  if (p >= 80) return 'c-hi';
-  if (p >= 45) return 'c-md';
-  return 'c-lo';
+function renderBar(barId, legendId, vg, good, bad) {
+  const total = vg + good + bad;
+  if (!total) return;
+  const pct = v => (v / total * 100).toFixed(1);
+  document.getElementById(barId).innerHTML =
+    `<div class="bar-vg" style="width:${pct(vg)}%"></div>` +
+    `<div class="bar-good" style="width:${pct(good)}%"></div>` +
+    `<div class="bar-bad" style="width:${pct(bad)}%"></div>`;
+  document.getElementById(legendId).textContent =
+    `V.Good ${pct(vg)}%  ·  Good ${pct(good)}%  ·  Bad ${pct(bad)}%`;
 }
 
-function statusBadge(npP, d2dP) {
-  const avg = (npP + d2dP) / 2;
-  if (avg >= 100) return ['COMPLETE', 'status-done'];
-  if (avg >= 70)  return ['ON TRACK', 'status-track'];
-  if (avg >= 35)  return ['IN PROG',  'status-behind'];
-  return ['EARLY', 'status-early'];
-}
+fetch('dct_data.json?_=' + Date.now())
+  .then(r => r.json())
+  .then(d => {
+    document.getElementById('updated').textContent = '数据时间: ' + (d.updated || '—');
 
-function passRate(dct, col) {
-  return col ? (dct / col * 100).toFixed(1) + '% 通过' : '—';
-}
+    const sc = d.sc, dlp = d.dlp;
+    document.getElementById('sc-vg').textContent   = fmt(sc.very_good);
+    document.getElementById('sc-good').textContent = fmt(sc.good);
+    document.getElementById('sc-bad').textContent  = fmt(sc.bad);
+    renderBar('sc-bar','sc-legend', sc.very_good, sc.good, sc.bad);
 
-/* ━━━━━━━━━━━━ render ━━━━━━━━━━━━ */
-function render() {
-  const today = new Date().toISOString().slice(0, 10);
-  document.getElementById('date-end').textContent   = today;
-  document.getElementById('update-ts').textContent  = LAST_UPDATED;
+    document.getElementById('dlp-vg').textContent   = fmt(dlp.very_good);
+    document.getElementById('dlp-good').textContent = fmt(dlp.good);
+    document.getElementById('dlp-bad').textContent  = fmt(dlp.bad);
+    renderBar('dlp-bar','dlp-legend', dlp.very_good, dlp.good, dlp.bad);
 
-  // Totals
-  let tNPcol=0, tNPdct=0;
-  PLATFORMS.forEach(p => p.vehicles.forEach(v => {
-    tNPcol += v.np.col; tNPdct += v.np.dct;
-  }));
+    const tbody = document.getElementById('route-tbody');
+    (d.routes || []).forEach(r => {
+      const modelTags = Object.entries(r.models || {}).map(([model, info]) => {
+        const vehs = (info.vehicles || []).join(', ');
+        return `<span class="model-tag"><span class="laps">${model} ×${info.laps}</span> (${vehs})</span>`;
+      }).join('');
 
-  document.getElementById('totals-bar').innerHTML = [
-    ['NP 总采集',      fmt(tNPcol), 'bags · 全平台合计'],
-    ['NP Auto-DCT 后', fmt(tNPdct), 'bags · 全平台合计'],
-  ].map(([lbl, val]) => `
-    <div class="tot-stat">
-      <div class="tot-val">${val}</div>
-      <div class="tot-lbl">${lbl}</div>
-    </div>
-  `).join('');
-
-  // Platforms
-  const main = document.getElementById('main');
-  PLATFORMS.forEach(platform => {
-    let pNPcol=0;
-    platform.vehicles.forEach(v => { pNPcol += v.np.col; });
-
-    const sec = document.createElement('section');
-    sec.className = `plat-section ${platform.id}`;
-    sec.innerHTML = `
-      <div class="plat-heading">
-        <div class="plat-icon">${platform.name}</div>
-        <div class="plat-title-wrap">
-          <div class="plat-title">${platform.name} 平台</div>
-          <div class="plat-sub">${platform.vehicles.length} 个车型</div>
-        </div>
-        <div class="plat-line"></div>
-        <div class="plat-meta">NP 总采集 ${fmt(pNPcol)}</div>
-      </div>
-      <div class="v-grid" id="grid-${platform.id}"></div>
-    `;
-    main.appendChild(sec);
-
-    const grid = sec.querySelector(`#grid-${platform.id}`);
-
-    platform.vehicles.forEach((v, i) => {
-      const npP  = pct(v.np.dct, NP_TARGET);
-      const [stLabel, stClass] = statusBadge(npP, npP);
-
-      const card = document.createElement('div');
-      card.className = 'v-card';
-      card.style.animationDelay = `${i * 55}ms`;
-
-      card.innerHTML = `
-        <div class="v-head">
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="v-model">${v.model}</div>
-            <span class="v-status ${stClass}">${stLabel}</span>
-          </div>
-          <div class="v-tags">
-            <span class="v-tag tag-np">NP</span>
-          </div>
-        </div>
-        <div class="v-body">
-
-          <!-- NP -->
-          <div class="feat feat-np">
-            <div class="feat-hd">
-              <div class="feat-lbl">
-                <span class="feat-badge">NP</span>
-                <span class="feat-desc">UNP + HNP</span>
-              </div>
-              <div class="feat-target">目标 <b>${fmt(NP_TARGET)}</b> bags</div>
-            </div>
-            <div class="metrics">
-              <div class="metric met-col">
-                <div class="met-lbl">采集数据</div>
-                <div class="met-val">${fmt(v.np.col)}</div>
-                <div class="met-sub">bags</div>
-              </div>
-              <div class="metric met-dct">
-                <div class="met-lbl">Auto-DCT 后</div>
-                <div class="met-val">${fmt(v.np.dct)}</div>
-                <div class="met-sub">${passRate(v.np.dct, v.np.col)}</div>
-              </div>
-            </div>
-            <div class="prog-hd">
-              <span class="prog-lbl">采集进度 &nbsp;${fmt(v.np.dct)} / ${fmt(NP_TARGET)}</span>
-              <span class="prog-pct ${pctClass(npP)}">${pctFmt(npP)}</span>
-            </div>
-            <div class="prog-track">
-              <div class="prog-fill" data-w="${npP}"></div>
-            </div>
-          </div>
-
-        </div>
-      `;
-      grid.appendChild(card);
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        `<td class="td-route">${r.route}</td>` +
+        `<td class="td-num">${r.laps}</td>` +
+        `<td class="td-num">${r.bag_cnt > 0 ? r.bag_cnt.toLocaleString() : '<span class="empty">—</span>'}</td>` +
+        `<td class="td-good">${r.good_cnt > 0 ? r.good_cnt.toLocaleString() : '<span class="empty">—</span>'}</td>` +
+        `<td><div class="td-models">${modelTags || '<span class="empty">—</span>'}</div></td>`;
+      tbody.appendChild(tr);
     });
+  })
+  .catch(() => {
+    document.getElementById('route-tbody').innerHTML =
+      '<tr><td colspan="5" style="text-align:center;color:#8b949e;padding:40px">暂无数据</td></tr>';
   });
-
-  // Animate progress bars after paint
-  requestAnimationFrame(() => {
-    setTimeout(() => {
-      document.querySelectorAll('.prog-fill').forEach(el => {
-        el.style.width = el.dataset.w + '%';
-      });
-    }, 150);
-  });
-}
-
-render();
 </script>
 </body>
 </html>
