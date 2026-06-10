@@ -7,7 +7,7 @@
 <script>
 (function(){
   var PASS = "pangu";
-  var ok = sessionStorage.getItem("dct_auth") === "1" || location.hostname === "10.21.163.195";
+  var ok = sessionStorage.getItem("dct_auth") === "1";
   if (!ok) {
     document.addEventListener("DOMContentLoaded", function(){
       document.body.style.display = "none";
@@ -43,7 +43,6 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0d1117; color: #e6edf3; min-height: 100vh; }
 
-/* ── header ── */
 .header {
   background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
   border-bottom: 1px solid #21262d;
@@ -54,52 +53,60 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 .header-sub { font-size: 13px; color: #8b949e; margin-top: 3px; }
 .header-updated { font-size: 12px; color: #8b949e; }
 
-/* ── summary cards ── */
-.cards { display: flex; gap: 20px; padding: 24px 32px 0; }
-.card {
-  flex: 1; background: #161b22; border: 1px solid #21262d;
-  border-radius: 12px; padding: 20px 24px;
+/* summary card */
+.summary-wrap { padding: 24px 32px 0; }
+.summary-card {
+  background: #161b22; border: 1px solid #21262d; border-radius: 12px;
+  padding: 20px 28px; display: inline-flex; flex-direction: column; min-width: 480px;
 }
 .card-title { font-size: 13px; color: #8b949e; margin-bottom: 14px; font-weight: 600; letter-spacing: .4px; }
-.card-nums { display: flex; gap: 24px; margin-bottom: 14px; }
+.card-nums { display: flex; gap: 28px; margin-bottom: 14px; align-items: flex-end; }
 .card-num-item { text-align: center; }
 .card-num-label { font-size: 11px; color: #8b949e; margin-bottom: 4px; }
 .num-vg   { font-size: 26px; font-weight: 700; color: #3fb950; }
 .num-good { font-size: 26px; font-weight: 700; color: #58a6ff; }
 .num-bad  { font-size: 26px; font-weight: 700; color: #f85149; }
+.num-unk  { font-size: 26px; font-weight: 700; color: #8b949e; }
+.num-total { font-size: 13px; color: #8b949e; }
 .bar-wrap { height: 8px; background: #21262d; border-radius: 4px; overflow: hidden; display: flex; }
 .bar-vg   { background: #3fb950; }
 .bar-good { background: #58a6ff; }
 .bar-bad  { background: #f85149; }
+.bar-unk  { background: #484f58; }
 .bar-legend { font-size: 11px; color: #8b949e; margin-top: 6px; }
 
-/* ── route table ── */
-.section { padding: 24px 32px 32px; }
-.section-title {
-  font-size: 15px; font-weight: 700; color: #e6edf3;
-  margin-bottom: 16px; padding-bottom: 10px;
+/* platform sections */
+.section { padding: 24px 32px 12px; }
+.platform-header {
+  font-size: 14px; font-weight: 700; color: #fff;
+  background: linear-gradient(90deg, #1f6feb 0%, #388bfd 100%);
+  padding: 8px 16px; border-radius: 8px; margin-bottom: 12px;
+}
+.platform-header.st3 { background: linear-gradient(90deg, #6e40c9 0%, #a371f7 100%); }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 8px; }
+thead th {
+  text-align: right; padding: 8px 12px;
+  color: #8b949e; font-weight: 600; font-size: 12px;
   border-bottom: 1px solid #21262d;
 }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-thead th {
-  text-align: left; padding: 10px 12px;
-  color: #8b949e; font-weight: 600; font-size: 12px;
-  border-bottom: 1px solid #21262d; white-space: nowrap;
-}
-tbody tr { border-bottom: 1px solid #161b22; }
+thead th:first-child { text-align: left; }
+tbody tr { border-bottom: 1px solid #1a2030; }
 tbody tr:hover { background: #161b22; }
-tbody td { padding: 10px 12px; vertical-align: middle; }
-.td-route { font-weight: 600; color: #58a6ff; max-width: 260px; word-break: break-all; }
-.td-num { text-align: right; color: #e6edf3; }
-.td-good { text-align: right; color: #3fb950; font-weight: 600; }
-.td-models { display: flex; flex-wrap: wrap; gap: 5px; }
-.model-tag {
-  background: #21262d; border: 1px solid #30363d;
-  border-radius: 6px; padding: 2px 8px;
-  font-size: 11px; color: #8b949e; white-space: nowrap;
-}
-.model-tag .laps { color: #58a6ff; font-weight: 600; }
-.empty { color: #484f58; font-style: italic; }
+tbody td { padding: 9px 12px; vertical-align: middle; }
+td:first-child { font-weight: 600; color: #e6edf3; }
+.td-vg   { text-align: right; color: #3fb950; font-weight: 600; }
+.td-good { text-align: right; color: #58a6ff; font-weight: 600; }
+.td-bad  { text-align: right; color: #f85149; }
+.td-unk  { text-align: right; color: #8b949e; }
+.td-bar  { width: 100px; padding-right: 16px; }
+.mini-bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; min-width: 80px; }
+.empty-row td { color: #484f58; font-style: italic; }
+.total-row td { border-top: 1px solid #30363d; font-weight: 700; color: #e6edf3; padding-top: 10px; }
+.total-row .td-vg   { color: #3fb950; }
+.total-row .td-good { color: #58a6ff; }
+.total-row .td-bad  { color: #f85149; }
+.total-row .td-unk  { color: #8b949e; }
 </style>
 </head>
 <body>
@@ -112,58 +119,83 @@ tbody td { padding: 10px 12px; vertical-align: middle; }
   <div class="header-updated" id="updated">—</div>
 </div>
 
-<div class="cards">
-  <div class="card">
+<div class="summary-wrap">
+  <div class="summary-card">
     <div class="card-title">多人校准数据量（全车型汇总）</div>
     <div class="card-nums">
-      <div class="card-num-item"><div class="card-num-label">Very Good</div><div class="num-vg" id="sc-vg">—</div></div>
-      <div class="card-num-item"><div class="card-num-label">Good</div><div class="num-good" id="sc-good">—</div></div>
-      <div class="card-num-item"><div class="card-num-label">Bad</div><div class="num-bad" id="sc-bad">—</div></div>
+      <div class="card-num-item"><div class="card-num-label">Very Good</div><div class="num-vg"  id="sc-vg">—</div></div>
+      <div class="card-num-item"><div class="card-num-label">Good</div>     <div class="num-good" id="sc-good">—</div></div>
+      <div class="card-num-item"><div class="card-num-label">Bad</div>      <div class="num-bad"  id="sc-bad">—</div></div>
+      <div class="card-num-item"><div class="card-num-label">Unknown</div>  <div class="num-unk"  id="sc-unk">—</div></div>
+      <div class="card-num-item" style="margin-left:12px"><div class="card-num-label">总计</div><div class="num-total" id="sc-total">—</div></div>
     </div>
     <div class="bar-wrap" id="sc-bar"></div>
     <div class="bar-legend" id="sc-legend"></div>
   </div>
-  <div class="card">
-    <div class="card-title">训练可用数据量（全车型汇总）</div>
-    <div class="card-nums">
-      <div class="card-num-item"><div class="card-num-label">Very Good</div><div class="num-vg" id="dlp-vg">—</div></div>
-      <div class="card-num-item"><div class="card-num-label">Good</div><div class="num-good" id="dlp-good">—</div></div>
-      <div class="card-num-item"><div class="card-num-label">Bad</div><div class="num-bad" id="dlp-bad">—</div></div>
-    </div>
-    <div class="bar-wrap" id="dlp-bar"></div>
-    <div class="bar-legend" id="dlp-legend"></div>
-  </div>
 </div>
 
 <div class="section">
-  <div class="section-title">路线 Bag 统计 — 按路线汇总圈数与采集数量</div>
+  <div class="platform-header">ST35 平台 — 449_A1p0 / C590 / V174 / V178 / V520 / V540</div>
   <table>
-    <thead>
-      <tr>
-        <th>路线名称</th>
-        <th style="text-align:right">圈数</th>
-        <th style="text-align:right">采集数量</th>
-        <th style="text-align:right">好数据量</th>
-        <th>各车型（圈数 / 车辆号）</th>
-      </tr>
-    </thead>
-    <tbody id="route-tbody"></tbody>
+    <thead><tr>
+      <th>车型</th>
+      <th>Very Good</th><th>Good</th><th>Bad</th><th>Unknown</th><th class="td-bar">分布</th>
+    </tr></thead>
+    <tbody id="st35-body"></tbody>
+  </table>
+</div>
+
+<div class="section">
+  <div class="platform-header st3">ST3 平台 — C167 / T167 / X167 / X167_Maybach / V167 / V223M / Z223M / V206M</div>
+  <table>
+    <thead><tr>
+      <th>车型</th>
+      <th>Very Good</th><th>Good</th><th>Bad</th><th>Unknown</th><th class="td-bar">分布</th>
+    </tr></thead>
+    <tbody id="st3-body"></tbody>
   </table>
 </div>
 
 <script>
-function fmt(n) { return n > 0 ? n.toLocaleString() : '—'; }
+const ST35 = ["449_A1p0","C590","V174","V178","V520","V540"];
+const ST3  = ["C167","T167","X167","X167_Maybach","V167","V223M","Z223M","V206M"];
 
-function renderBar(barId, legendId, vg, good, bad) {
-  const total = vg + good + bad;
-  if (!total) return;
-  const pct = v => (v / total * 100).toFixed(1);
-  document.getElementById(barId).innerHTML =
-    `<div class="bar-vg" style="width:${pct(vg)}%"></div>` +
-    `<div class="bar-good" style="width:${pct(good)}%"></div>` +
-    `<div class="bar-bad" style="width:${pct(bad)}%"></div>`;
-  document.getElementById(legendId).textContent =
-    `V.Good ${pct(vg)}%  ·  Good ${pct(good)}%  ·  Bad ${pct(bad)}%`;
+function fmt(n) { return (n > 0) ? n.toLocaleString() : '0'; }
+
+function miniBar(vg, good, bad, unk) {
+  const total = vg + good + bad + unk;
+  if (!total) return '<div class="mini-bar" style="background:#21262d"></div>';
+  const p = v => (v / total * 100).toFixed(1);
+  return `<div class="mini-bar">
+    <div style="background:#3fb950;width:${p(vg)}%"></div>
+    <div style="background:#58a6ff;width:${p(good)}%"></div>
+    <div style="background:#f85149;width:${p(bad)}%"></div>
+    <div style="background:#484f58;width:${p(unk)}%"></div>
+  </div>`;
+}
+
+function renderTable(tbodyId, models, data) {
+  const tbody = document.getElementById(tbodyId);
+  let totVg=0, totGood=0, totBad=0, totUnk=0;
+  models.forEach(m => {
+    const sc = (data[m]) || {very_good:0,good:0,bad:0,unknown:0};
+    const vg=sc.very_good||0, good=sc.good||0, bad=sc.bad||0, unk=sc.unknown||0;
+    const total = vg+good+bad+unk;
+    totVg+=vg; totGood+=good; totBad+=bad; totUnk+=unk;
+    const tr = document.createElement('tr');
+    if (!total) tr.className = 'empty-row';
+    tr.innerHTML = `<td>${m}</td>`
+      + (total ? `<td class="td-vg">${fmt(vg)}</td><td class="td-good">${fmt(good)}</td><td class="td-bad">${fmt(bad)}</td><td class="td-unk">${fmt(unk)}</td>`
+               : `<td colspan="4" style="text-align:center;color:#484f58;font-style:italic">暂无数据</td>`)
+      + `<td class="td-bar">${total ? miniBar(vg,good,bad,unk) : ''}</td>`;
+    tbody.appendChild(tr);
+  });
+  const tr = document.createElement('tr');
+  tr.className = 'total-row';
+  tr.innerHTML = `<td>合计</td>`
+    + `<td class="td-vg">${fmt(totVg)}</td><td class="td-good">${fmt(totGood)}</td><td class="td-bad">${fmt(totBad)}</td><td class="td-unk">${fmt(totUnk)}</td>`
+    + `<td class="td-bar">${miniBar(totVg,totGood,totBad,totUnk)}</td>`;
+  tbody.appendChild(tr);
 }
 
 fetch('dct_data.json?_=' + Date.now())
@@ -171,37 +203,31 @@ fetch('dct_data.json?_=' + Date.now())
   .then(d => {
     document.getElementById('updated').textContent = '数据时间: ' + (d.updated || '—');
 
-    const sc = d.sc, dlp = d.dlp;
-    document.getElementById('sc-vg').textContent   = fmt(sc.very_good);
-    document.getElementById('sc-good').textContent = fmt(sc.good);
-    document.getElementById('sc-bad').textContent  = fmt(sc.bad);
-    renderBar('sc-bar','sc-legend', sc.very_good, sc.good, sc.bad);
+    const sc = d.sc;
+    const vg=sc.very_good||0, good=sc.good||0, bad=sc.bad||0, unk=sc.unknown||0;
+    const total = vg+good+bad+unk;
+    document.getElementById('sc-vg').textContent   = fmt(vg);
+    document.getElementById('sc-good').textContent = fmt(good);
+    document.getElementById('sc-bad').textContent  = fmt(bad);
+    document.getElementById('sc-unk').textContent  = fmt(unk);
+    document.getElementById('sc-total').textContent = '总计: ' + total.toLocaleString();
+    if (total) {
+      const p = v => (v/total*100).toFixed(1);
+      document.getElementById('sc-bar').innerHTML =
+        `<div class="bar-vg" style="width:${p(vg)}%"></div>`+
+        `<div class="bar-good" style="width:${p(good)}%"></div>`+
+        `<div class="bar-bad" style="width:${p(bad)}%"></div>`+
+        `<div class="bar-unk" style="width:${p(unk)}%"></div>`;
+      document.getElementById('sc-legend').textContent =
+        `VG ${p(vg)}%  ·  Good ${p(good)}%  ·  Bad ${p(bad)}%  ·  Unk ${p(unk)}%`;
+    }
 
-    document.getElementById('dlp-vg').textContent   = fmt(dlp.very_good);
-    document.getElementById('dlp-good').textContent = fmt(dlp.good);
-    document.getElementById('dlp-bad').textContent  = fmt(dlp.bad);
-    renderBar('dlp-bar','dlp-legend', dlp.very_good, dlp.good, dlp.bad);
-
-    const tbody = document.getElementById('route-tbody');
-    (d.routes || []).forEach(r => {
-      const modelTags = Object.entries(r.models || {}).map(([model, info]) => {
-        const vehs = (info.vehicles || []).join(', ');
-        return `<span class="model-tag"><span class="laps">${model} ×${info.laps}</span> (${vehs})</span>`;
-      }).join('');
-
-      const tr = document.createElement('tr');
-      tr.innerHTML =
-        `<td class="td-route">${r.route}</td>` +
-        `<td class="td-num">${r.laps}</td>` +
-        `<td class="td-num">${r.bag_cnt > 0 ? r.bag_cnt.toLocaleString() : '<span class="empty">—</span>'}</td>` +
-        `<td class="td-good">${r.good_cnt > 0 ? r.good_cnt.toLocaleString() : '<span class="empty">—</span>'}</td>` +
-        `<td><div class="td-models">${modelTags || '<span class="empty">—</span>'}</div></td>`;
-      tbody.appendChild(tr);
-    });
+    const models = d.models || {};
+    renderTable('st35-body', ST35, models);
+    renderTable('st3-body',  ST3,  models);
   })
   .catch(() => {
-    document.getElementById('route-tbody').innerHTML =
-      '<tr><td colspan="5" style="text-align:center;color:#8b949e;padding:40px">暂无数据</td></tr>';
+    document.getElementById('updated').textContent = '数据加载失败';
   });
 </script>
 </body>
