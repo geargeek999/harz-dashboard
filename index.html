@@ -128,11 +128,8 @@ td:first-child { font-weight: 600; color: #1e2a3a; }
       <div class="card-num-item"><div class="card-num-label">Very Good</div><div class="num-vg"  id="sc-vg">—</div></div>
       <div class="card-num-item"><div class="card-num-label">Good</div>     <div class="num-good" id="sc-good">—</div></div>
       <div class="card-num-item"><div class="card-num-label">Bad</div>      <div class="num-bad"  id="sc-bad">—</div></div>
-      <div class="card-num-item"><div class="card-num-label">Unknown</div>  <div class="num-unk"  id="sc-unk">—</div></div>
-      <div class="card-num-item" style="margin-left:12px"><div class="card-num-label">总计</div><div class="num-total" id="sc-total">—</div></div>
     </div>
     <div class="bar-wrap" id="sc-bar"></div>
-    <div class="bar-legend" id="sc-legend"></div>
   </div>
 </div>
 
@@ -141,7 +138,7 @@ td:first-child { font-weight: 600; color: #1e2a3a; }
   <table>
     <thead><tr>
       <th>车型</th>
-      <th>Very Good</th><th>Good</th><th>Bad</th><th>Unknown</th><th class="td-bar">分布</th>
+      <th>Very Good</th><th>Good</th><th>Bad</th>
     </tr></thead>
     <tbody id="st35-body"></tbody>
   </table>
@@ -152,7 +149,7 @@ td:first-child { font-weight: 600; color: #1e2a3a; }
   <table>
     <thead><tr>
       <th>车型</th>
-      <th>Very Good</th><th>Good</th><th>Bad</th><th>Unknown</th><th class="td-bar">分布</th>
+      <th>Very Good</th><th>Good</th><th>Bad</th>
     </tr></thead>
     <tbody id="st3-body"></tbody>
   </table>
@@ -178,25 +175,23 @@ function miniBar(vg, good, bad, unk) {
 
 function renderTable(tbodyId, models, data) {
   const tbody = document.getElementById(tbodyId);
-  let totVg=0, totGood=0, totBad=0, totUnk=0;
+  let totVg=0, totGood=0, totBad=0;
   models.forEach(m => {
     const sc = (data[m]) || {very_good:0,good:0,bad:0,unknown:0};
     const vg=sc.very_good||0, good=sc.good||0, bad=sc.bad||0, unk=sc.unknown||0;
     const total = vg+good+bad+unk;
-    totVg+=vg; totGood+=good; totBad+=bad; totUnk+=unk;
+    totVg+=vg; totGood+=good; totBad+=bad;
     const tr = document.createElement('tr');
     if (!total) tr.className = 'empty-row';
     tr.innerHTML = `<td>${m}</td>`
-      + (total ? `<td class="td-vg">${fmt(vg)}</td><td class="td-good">${fmt(good)}</td><td class="td-bad">${fmt(bad)}</td><td class="td-unk">${fmt(unk)}</td>`
-               : `<td colspan="4" style="text-align:center;color:#cbd5e1;font-style:italic">暂无数据</td>`)
-      + `<td class="td-bar">${total ? miniBar(vg,good,bad,unk) : ''}</td>`;
+      + (total ? `<td class="td-vg">${fmt(vg)}</td><td class="td-good">${fmt(good)}</td><td class="td-bad">${fmt(bad)}</td>`
+               : `<td colspan="3" style="text-align:center;color:#cbd5e1;font-style:italic">暂无数据</td>`);
     tbody.appendChild(tr);
   });
   const tr = document.createElement('tr');
   tr.className = 'total-row';
   tr.innerHTML = `<td>合计</td>`
-    + `<td class="td-vg">${fmt(totVg)}</td><td class="td-good">${fmt(totGood)}</td><td class="td-bad">${fmt(totBad)}</td><td class="td-unk">${fmt(totUnk)}</td>`
-    + `<td class="td-bar">${miniBar(totVg,totGood,totBad,totUnk)}</td>`;
+    + `<td class="td-vg">${fmt(totVg)}</td><td class="td-good">${fmt(totGood)}</td><td class="td-bad">${fmt(totBad)}</td>`;
   tbody.appendChild(tr);
 }
 
@@ -211,8 +206,6 @@ fetch('dct_data.json?_=' + Date.now())
     document.getElementById('sc-vg').textContent   = fmt(vg);
     document.getElementById('sc-good').textContent = fmt(good);
     document.getElementById('sc-bad').textContent  = fmt(bad);
-    document.getElementById('sc-unk').textContent  = fmt(unk);
-    document.getElementById('sc-total').textContent = '总计: ' + total.toLocaleString();
     if (total) {
       const p = v => (v/total*100).toFixed(1);
       document.getElementById('sc-bar').innerHTML =
@@ -220,8 +213,6 @@ fetch('dct_data.json?_=' + Date.now())
         `<div class="bar-good" style="width:${p(good)}%"></div>`+
         `<div class="bar-bad" style="width:${p(bad)}%"></div>`+
         `<div class="bar-unk" style="width:${p(unk)}%"></div>`;
-      document.getElementById('sc-legend').textContent =
-        `VG ${p(vg)}%  ·  Good ${p(good)}%  ·  Bad ${p(bad)}%  ·  Unk ${p(unk)}%`;
     }
 
     const models = d.models || {};
