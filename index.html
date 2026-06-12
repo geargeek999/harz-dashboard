@@ -92,7 +92,8 @@ thead th {
   color: #64748b; font-weight: 600; font-size: 12px;
   border-bottom: 1px solid #e2e8f0; background: #f8fafc;
 }
-thead th:first-child { text-align: left; width: 260px; }
+thead th:first-child { text-align: left; width: 220px; }
+.td-bags { text-align: center; color: #16a34a; font-weight: 600; }
 tbody tr { border-bottom: 1px solid #f1f5f9; }
 tbody tr:hover { background: #f8fafc; }
 tbody td { padding: 9px 12px; vertical-align: middle; text-align: center; }
@@ -121,7 +122,16 @@ td:first-child { font-weight: 600; color: #1e2a3a; text-align: left; }
   <div class="header-updated" id="updated">—</div>
 </div>
 
-<div class="summary-wrap">
+<div class="summary-wrap" style="display:flex;gap:16px;flex-wrap:wrap">
+  <div class="summary-card" style="min-width:200px;max-width:240px">
+    <div class="card-title">累计采集包数（UNP/HNP）</div>
+    <div class="card-nums" style="justify-content:center">
+      <div class="card-num-item">
+        <div class="card-num-label">总包数</div>
+        <div class="num-vg" id="total-bags" style="font-size:30px">—</div>
+      </div>
+    </div>
+  </div>
   <div class="summary-card">
     <div class="card-title">多人校准数据量（全车型汇总）</div>
     <div class="card-nums">
@@ -138,6 +148,7 @@ td:first-child { font-weight: 600; color: #1e2a3a; text-align: left; }
   <table>
     <thead><tr>
       <th>车型</th>
+      <th>采集包数</th>
       <th>Very Good</th><th>Good</th><th>Bad</th>
     </tr></thead>
     <tbody id="st35-body"></tbody>
@@ -149,6 +160,7 @@ td:first-child { font-weight: 600; color: #1e2a3a; text-align: left; }
   <table>
     <thead><tr>
       <th>车型</th>
+      <th>采集包数</th>
       <th>Very Good</th><th>Good</th><th>Bad</th>
     </tr></thead>
     <tbody id="st3-body"></tbody>
@@ -175,15 +187,18 @@ function miniBar(vg, good, bad, unk) {
 
 function renderTable(tbodyId, models, data) {
   const tbody = document.getElementById(tbodyId);
-  let totVg=0, totGood=0, totBad=0;
+  let totVg=0, totGood=0, totBad=0, totBags=0;
   models.forEach(m => {
-    const sc = (data[m]) || {very_good:0,good:0,bad:0,unknown:0};
-    const vg=sc.very_good||0, good=sc.good||0, bad=sc.bad||0, unk=sc.unknown||0;
-    const total = vg+good+bad+unk;
-    totVg+=vg; totGood+=good; totBad+=bad;
+    const sc = (data[m]) || {very_good:0,good:0,bad:0,unknown:0,bags:0};
+    const vg=sc.very_good||0, good=sc.good||0, bad=sc.bad||0, bags=sc.bags||0;
+    const total = vg+good+bad+(sc.unknown||0);
+    totVg+=vg; totGood+=good; totBad+=bad; totBags+=bags;
     const tr = document.createElement('tr');
-    if (!total) tr.className = 'empty-row';
-    tr.innerHTML = `<td>${m}</td>`
+    if (!total && !bags) tr.className = 'empty-row';
+    const bagsCell = bags > 0
+      ? `<td class="td-bags">${bags.toLocaleString()}</td>`
+      : `<td style="text-align:center;color:#cbd5e1">0</td>`;
+    tr.innerHTML = `<td>${m}</td>` + bagsCell
       + (total ? `<td class="td-vg">${fmt(vg)}</td><td class="td-good">${fmt(good)}</td><td class="td-bad">${fmt(bad)}</td>`
                : `<td colspan="3" style="text-align:center;color:#cbd5e1;font-style:italic">暂无数据</td>`);
     tbody.appendChild(tr);
@@ -191,6 +206,7 @@ function renderTable(tbodyId, models, data) {
   const tr = document.createElement('tr');
   tr.className = 'total-row';
   tr.innerHTML = `<td>合计</td>`
+    + `<td class="td-bags">${totBags.toLocaleString()}</td>`
     + `<td class="td-vg">${fmt(totVg)}</td><td class="td-good">${fmt(totGood)}</td><td class="td-bad">${fmt(totBad)}</td>`;
   tbody.appendChild(tr);
 }
@@ -199,6 +215,7 @@ fetch('dct_data.json?_=' + Date.now())
   .then(r => r.json())
   .then(d => {
     document.getElementById('updated').textContent = '数据时间: ' + (d.updated || '—');
+    if (d.total_bags != null) document.getElementById('total-bags').textContent = d.total_bags.toLocaleString();
 
     const sc = d.sc;
     const vg=sc.very_good||0, good=sc.good||0, bad=sc.bad||0, unk=sc.unknown||0;
