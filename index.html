@@ -224,7 +224,7 @@ function renderTable(tbodyId, models, data) {
   tr.innerHTML = `<td>合计</td>`
     + `<td class="td-bags">${totBags.toLocaleString()}</td>`
     + `<td class="td-good">${totEff.toLocaleString()}</td>`
-    + progressCell(totEff);
+    + `<td></td>`;
   tbody.appendChild(tr);
 }
 
