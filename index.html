@@ -140,6 +140,7 @@ td:first-child { font-weight: 600; color: #1e2a3a; text-align: left; }
     <thead><tr>
       <th>车型</th>
       <th>采集包数</th>
+      <th>有效包数</th>
     </tr></thead>
     <tbody id="st35-body"></tbody>
   </table>
@@ -151,6 +152,7 @@ td:first-child { font-weight: 600; color: #1e2a3a; text-align: left; }
     <thead><tr>
       <th>车型</th>
       <th>采集包数</th>
+      <th>有效包数</th>
     </tr></thead>
     <tbody id="st3-body"></tbody>
   </table>
@@ -176,24 +178,28 @@ function miniBar(vg, good, bad, unk) {
 
 function renderTable(tbodyId, models, data) {
   const tbody = document.getElementById(tbodyId);
-  let totVg=0, totGood=0, totBad=0, totBags=0;
+  let totBags=0, totEff=0;
   models.forEach(m => {
-    const sc = (data[m]) || {very_good:0,good:0,bad:0,unknown:0,bags:0};
-    const vg=sc.very_good||0, good=sc.good||0, bad=sc.bad||0, bags=sc.bags||0;
-    const total = vg+good+bad+(sc.unknown||0);
-    totVg+=vg; totGood+=good; totBad+=bad; totBags+=bags;
+    const sc = (data[m]) || {very_good:0,good:0,bad:0,unknown:0,bags:0,effective_bags:0};
+    const bags=sc.bags||0, eff=sc.effective_bags||0;
+    const total = (sc.very_good||0)+(sc.good||0)+(sc.bad||0)+(sc.unknown||0);
+    totBags+=bags; totEff+=eff;
     const tr = document.createElement('tr');
     if (!total && !bags) tr.className = 'empty-row';
     const bagsCell = bags > 0
       ? `<td class="td-bags">${bags.toLocaleString()}</td>`
       : `<td style="text-align:center;color:#cbd5e1">0</td>`;
-    tr.innerHTML = `<td>${m}</td>` + bagsCell;
+    const effCell = eff > 0
+      ? `<td class="td-good">${eff.toLocaleString()}</td>`
+      : `<td style="text-align:center;color:#cbd5e1">—</td>`;
+    tr.innerHTML = `<td>${m}</td>` + bagsCell + effCell;
     tbody.appendChild(tr);
   });
   const tr = document.createElement('tr');
   tr.className = 'total-row';
   tr.innerHTML = `<td>合计</td>`
-    + `<td class="td-bags">${totBags.toLocaleString()}</td>`;
+    + `<td class="td-bags">${totBags.toLocaleString()}</td>`
+    + `<td class="td-good">${totEff.toLocaleString()}</td>`;
   tbody.appendChild(tr);
 }
 
