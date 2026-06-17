@@ -110,6 +110,15 @@ td:first-child { font-weight: 600; color: #1e2a3a; text-align: left; }
 .total-row .td-good { color: #2563eb; }
 .total-row .td-bad  { color: #dc2626; }
 .total-row .td-unk  { color: #94a3b8; }
+.td-progress { min-width: 140px; }
+.progress-wrap { display:flex; align-items:center; gap:8px; }
+.progress-bar-bg { flex:1; height:8px; background:#e2e8f0; border-radius:4px; overflow:hidden; }
+.progress-bar-fill { height:100%; border-radius:4px; background:#16a34a; transition:width .3s; }
+.progress-bar-fill.warn { background:#f59e0b; }
+.progress-bar-fill.low  { background:#e2e8f0; }
+.progress-pct { font-size:12px; font-weight:700; color:#16a34a; white-space:nowrap; min-width:38px; }
+.progress-pct.warn { color:#f59e0b; }
+.progress-pct.low  { color:#94a3b8; }
 </style>
 </head>
 <body>
@@ -141,6 +150,7 @@ td:first-child { font-weight: 600; color: #1e2a3a; text-align: left; }
       <th>车型</th>
       <th>采集包数</th>
       <th>有效包数</th>
+      <th>完成进度</th>
     </tr></thead>
     <tbody id="st35-body"></tbody>
   </table>
@@ -153,6 +163,7 @@ td:first-child { font-weight: 600; color: #1e2a3a; text-align: left; }
       <th>车型</th>
       <th>采集包数</th>
       <th>有效包数</th>
+      <th>完成进度</th>
     </tr></thead>
     <tbody id="st3-body"></tbody>
   </table>
@@ -176,6 +187,19 @@ function miniBar(vg, good, bad, unk) {
   </div>`;
 }
 
+const TARGET = 20000;
+function progressCell(eff) {
+  if (!eff) return `<td class="td-progress"><span style="color:#cbd5e1">—</span></td>`;
+  const pct = Math.min(eff / TARGET * 100, 100);
+  const cls = pct >= 100 ? '' : pct >= 50 ? 'warn' : 'low';
+  return `<td class="td-progress">
+    <div class="progress-wrap">
+      <div class="progress-bar-bg"><div class="progress-bar-fill ${cls}" style="width:${pct.toFixed(1)}%"></div></div>
+      <span class="progress-pct ${cls}">${pct.toFixed(1)}%</span>
+    </div>
+  </td>`;
+}
+
 function renderTable(tbodyId, models, data) {
   const tbody = document.getElementById(tbodyId);
   let totBags=0, totEff=0;
@@ -192,14 +216,15 @@ function renderTable(tbodyId, models, data) {
     const effCell = eff > 0
       ? `<td class="td-good">${eff.toLocaleString()}</td>`
       : `<td style="text-align:center;color:#cbd5e1">—</td>`;
-    tr.innerHTML = `<td>${m}</td>` + bagsCell + effCell;
+    tr.innerHTML = `<td>${m}</td>` + bagsCell + effCell + progressCell(eff);
     tbody.appendChild(tr);
   });
   const tr = document.createElement('tr');
   tr.className = 'total-row';
   tr.innerHTML = `<td>合计</td>`
     + `<td class="td-bags">${totBags.toLocaleString()}</td>`
-    + `<td class="td-good">${totEff.toLocaleString()}</td>`;
+    + `<td class="td-good">${totEff.toLocaleString()}</td>`
+    + progressCell(totEff);
   tbody.appendChild(tr);
 }
 
