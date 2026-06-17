@@ -203,21 +203,6 @@ fetch('dct_data.json?_=' + Date.now())
     document.getElementById('updated').textContent = '数据时间: ' + (d.updated || '—');
     if (d.total_bags != null) document.getElementById('total-bags').textContent = d.total_bags.toLocaleString();
 
-    const sc = d.sc;
-    const vg=sc.very_good||0, good=sc.good||0, bad=sc.bad||0, unk=sc.unknown||0;
-    const total = vg+good+bad+unk;
-    document.getElementById('sc-vg').textContent   = fmt(vg);
-    document.getElementById('sc-good').textContent = fmt(good);
-    document.getElementById('sc-bad').textContent  = fmt(bad);
-    if (total) {
-      const p = v => (v/total*100).toFixed(1);
-      document.getElementById('sc-bar').innerHTML =
-        `<div class="bar-vg" style="width:${p(vg)}%"></div>`+
-        `<div class="bar-good" style="width:${p(good)}%"></div>`+
-        `<div class="bar-bad" style="width:${p(bad)}%"></div>`+
-        `<div class="bar-unk" style="width:${p(unk)}%"></div>`;
-    }
-
     const models = d.models || {};
     renderTable('st35-body', ST35, models);
     renderTable('st3-body',  ST3,  models);
