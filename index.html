@@ -143,6 +143,23 @@ td.td-progress { min-width: 160px; padding: 8px 14px; }
 .progress-pct.warn { color: #faad14; }
 .progress-pct.low  { color: #bfbfbf; }
 
+/* ── Summary row ── */
+.summary-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.summary-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border-left: 4px solid #1677ff;
+  min-width: 200px;
+}
+.summary-label { font-size: 13px; color: #888; margin-bottom: 8px; }
+.summary-value { font-size: 28px; font-weight: 800; color: #1677ff; }
+
 /* ── Footer ── */
 .footer {
   text-align: center;
@@ -167,6 +184,17 @@ td.td-progress { min-width: 160px; padding: 8px 14px; }
 </div>
 
 <div class="container">
+
+  <div class="summary-row">
+    <div class="summary-card">
+      <div class="summary-label">累计采集包数（UNP/HNP·全车型）</div>
+      <div class="summary-value" id="total-bags">—</div>
+    </div>
+    <div class="summary-card" style="border-left-color:#52c41a">
+      <div class="summary-label">有效包数合计（全车型）</div>
+      <div class="summary-value" style="color:#52c41a" id="total-eff">—</div>
+    </div>
+  </div>
 
   <div class="platform-section platform-st35">
     <div class="platform-title">▌ ST35 平台 — 449_A1p0 / C590 / V174 / V178 / V520 / V540</div>
@@ -256,6 +284,11 @@ fetch('dct_data.json?_=' + Date.now())
   .then(d => {
     document.getElementById('updated').textContent = '更新时间: ' + (d.updated || '—');
     const models = d.models || {};
+    // 累计包数汇总
+    let sumBags = 0, sumEff = 0;
+    Object.values(models).forEach(m => { sumBags += m.bags || 0; sumEff += m.effective_bags || 0; });
+    document.getElementById('total-bags').textContent = sumBags.toLocaleString();
+    document.getElementById('total-eff').textContent  = sumEff.toLocaleString();
     renderTable('st35-body', ST35, models);
     renderTable('st3-body',  ST3,  models);
   })
