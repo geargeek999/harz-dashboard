@@ -4,248 +4,153 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>副驾DCT数据看板 - Harz</title>
+<script>
+(function(){
+  var PASS = "pangu";
+  var ok = sessionStorage.getItem("dct_auth") === "1";
+  if (!ok) {
+    document.addEventListener("DOMContentLoaded", function(){
+      document.body.style.display = "none";
+      var overlay = document.createElement("div");
+      overlay.style.cssText = "position:fixed;inset:0;background:#f0f4fa;display:flex;align-items:center;justify-content:center;z-index:9999;";
+      overlay.innerHTML = '<div style="background:#fff;border-radius:16px;padding:40px 48px;box-shadow:0 8px 32px rgba(0,0,0,.12);text-align:center;min-width:320px;">'
+        + '<div style="font-size:28px;font-weight:700;color:#1e2a3a;margin-bottom:8px;">副驾DCT数据看板</div>'
+        + '<div style="color:#5a6a85;margin-bottom:28px;">请输入访问密码</div>'
+        + '<input id="pw" type="password" placeholder="Password" style="width:100%;padding:12px 16px;border:1.5px solid #dde4ef;border-radius:8px;font-size:15px;outline:none;box-sizing:border-box;margin-bottom:12px;" />'
+        + '<div id="err" style="color:#ef4444;font-size:13px;margin-bottom:10px;min-height:18px;"></div>'
+        + '<button id="btn" style="width:100%;padding:12px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;">进入</button>'
+        + '</div>';
+      document.body.parentNode.insertBefore(overlay, document.body);
+      function tryLogin(){
+        if(document.getElementById("pw").value === PASS){
+          sessionStorage.setItem("dct_auth","1");
+          overlay.remove();
+          document.body.style.display = "";
+        } else {
+          document.getElementById("err").textContent = "密码错误，请重试";
+          document.getElementById("pw").value = "";
+          document.getElementById("pw").focus();
+        }
+      }
+      document.getElementById("btn").addEventListener("click", tryLogin);
+      document.getElementById("pw").addEventListener("keydown", function(e){ if(e.key==="Enter") tryLogin(); });
+      document.getElementById("pw").focus();
+    });
+  }
+})();
+</script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-    background: #f0f2f5;
-    color: #333;
-    min-height: 100vh;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #f0f2f5;
+  color: #333;
+  min-height: 100vh;
+}
 
-  /* ── Header ── */
-  .header {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    color: #fff;
-    padding: 20px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-  }
-  .header-left h1 { font-size: 22px; font-weight: 700; letter-spacing: 1px; }
-  .header-left .subtitle { font-size: 13px; color: #aaa; margin-top: 4px; }
-  .header-right { text-align: right; }
-  .header-right .badge {
-    display: inline-block;
-    background: rgba(82,196,26,0.2);
-    border: 1px solid #52c41a;
-    color: #73d13d;
-    padding: 3px 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    margin-bottom: 6px;
-  }
-  .header-right .updated { font-size: 12px; color: #888; }
+/* ── Header ── */
+.header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: #fff;
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+.header-left h1 { font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+.header-left .subtitle { font-size: 13px; color: #aaa; margin-top: 4px; }
+.header-right { text-align: right; }
+.header-right .badge {
+  display: inline-block;
+  background: rgba(82,196,26,0.2);
+  border: 1px solid #52c41a;
+  color: #73d13d;
+  padding: 3px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.header-right .updated { font-size: 12px; color: #888; }
 
-  /* ── Platform block ── */
-  .container { padding: 24px 32px; max-width: 1600px; margin: 0 auto; }
+/* ── Platform block ── */
+.container { padding: 24px 32px; max-width: 1200px; margin: 0 auto; }
 
-  .platform-section { margin-bottom: 32px; }
-  .platform-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: #fff;
-    padding: 8px 20px;
-    border-radius: 6px 6px 0 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .platform-st35 .platform-title { background: linear-gradient(90deg, #1677ff, #4096ff); }
-  .platform-st3  .platform-title { background: linear-gradient(90deg, #722ed1, #9254de); }
+.platform-section { margin-bottom: 32px; }
+.platform-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 6px 6px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.platform-st35 .platform-title { background: linear-gradient(90deg, #1677ff, #4096ff); }
+.platform-st3  .platform-title { background: linear-gradient(90deg, #722ed1, #9254de); }
 
-  .platform-body {
-    background: #fff;
-    border-radius: 0 0 8px 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    overflow: hidden;
-  }
+.platform-body {
+  background: #fff;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
 
-  /* ── Table ── */
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead tr { background: #fafafa; border-bottom: 2px solid #e8e8e8; }
-  thead th {
-    padding: 10px 14px;
-    text-align: center;
-    font-weight: 600;
-    color: #555;
-    white-space: nowrap;
-  }
-  thead th.model-col { text-align: left; min-width: 130px; }
-  thead th.group-header {
-    background: #f6f6f6;
-    border-bottom: 2px solid #e0e0e0;
-    font-size: 12px;
-    letter-spacing: 0.5px;
-  }
-  thead .sub-header th {
-    font-size: 11px;
-    color: #888;
-    padding: 6px 14px;
-    border-bottom: 1px solid #eee;
-  }
+/* ── Table ── */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead tr { background: #fafafa; border-bottom: 2px solid #e8e8e8; }
+thead th {
+  padding: 10px 14px;
+  text-align: center;
+  font-weight: 600;
+  color: #555;
+  white-space: nowrap;
+}
+thead th.model-col { text-align: left; min-width: 130px; }
 
-  tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.15s; }
-  tbody tr:hover { background: #f8faff; }
-  tbody tr.no-data td { color: #bbb; font-style: italic; }
-  tbody tr.total-row {
-    background: #f5f5f5;
-    border-top: 2px solid #ddd;
-    font-weight: 700;
-  }
-  tbody td { padding: 10px 14px; text-align: center; }
-  tbody td.model-col { text-align: left; font-weight: 600; color: #333; }
+tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.15s; }
+tbody tr:hover { background: #f8faff; }
+tbody tr.total-row {
+  background: #f5f5f5;
+  border-top: 2px solid #ddd;
+  font-weight: 700;
+}
+tbody td { padding: 10px 14px; text-align: center; }
+tbody td.model-col { text-align: left; font-weight: 600; color: #333; }
 
-  /* Quality number cells */
-  td.vg    { color: #13c2c2; font-weight: 700; }
-  td.good  { color: #52c41a; }
-  td.bad   { color: #ff4d4f; }
-  td.unk   { color: #8c8c8c; }
-  td.zero  { color: #d9d9d9; }
+td.td-bags { color: #1677ff; font-weight: 700; }
+td.td-good { color: #52c41a; font-weight: 700; }
 
-  /* ── Progress bar ── */
-  .bar-cell { min-width: 120px; padding: 10px 14px; }
-  .bar-wrap { height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden; display: flex; }
-  .bar-vg   { background: #13c2c2; }
-  .bar-good { background: #52c41a; }
-  .bar-bad  { background: #ff4d4f; }
-  .bar-unk  { background: #d9d9d9; }
-  .bar-none { background: #e8e8e8; width: 100%; }
+/* ── Progress bar ── */
+td.td-progress { min-width: 160px; padding: 8px 14px; }
+.progress-wrap { display: flex; align-items: center; gap: 8px; }
+.progress-bar-bg {
+  flex: 1;
+  height: 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: #52c41a;
+}
+.progress-bar-fill.warn { background: #faad14; }
+.progress-bar-fill.low  { background: #d9d9d9; }
+.progress-pct { font-size: 12px; font-weight: 700; color: #52c41a; white-space: nowrap; min-width: 42px; text-align: right; }
+.progress-pct.warn { color: #faad14; }
+.progress-pct.low  { color: #bfbfbf; }
 
-  /* ── Summary cards at top ── */
-  .summary-row {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-  .summary-card {
-    flex: 1;
-    background: #fff;
-    border-radius: 8px;
-    padding: 16px 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-    border-left: 4px solid #1677ff;
-  }
-  .summary-card h3 { font-size: 13px; color: #888; margin-bottom: 10px; }
-  .summary-card .quality-row {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-  }
-  .q-item { text-align: center; }
-  .q-item .q-label { font-size: 11px; color: #999; }
-  .q-item .q-value { font-size: 22px; font-weight: 800; }
-  .q-item.qvg .q-value  { color: #13c2c2; }
-  .q-item.qgood .q-value { color: #52c41a; }
-  .q-item.qbad .q-value  { color: #ff4d4f; }
-  .q-item.qunk .q-value  { color: #8c8c8c; }
-
-  .summary-bar {
-    height: 6px;
-    background: #f0f0f0;
-    border-radius: 3px;
-    overflow: hidden;
-    display: flex;
-    margin-top: 10px;
-  }
-
-  .sep-col { width: 24px; background: #f9f9f9; border-left: 1px solid #f0f0f0; border-right: 1px solid #f0f0f0; }
-
-  /* ── Tabs ── */
-  .tab-bar {
-    background: #16213e;
-    padding: 0 32px;
-    display: flex;
-    gap: 4px;
-    border-bottom: 2px solid rgba(255,255,255,0.07);
-  }
-  .tab-btn {
-    padding: 12px 24px;
-    color: #aaa;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    border-bottom: 3px solid transparent;
-    margin-bottom: -2px;
-    transition: all 0.2s;
-    letter-spacing: 0.5px;
-  }
-  .tab-btn:hover { color: #fff; }
-  .tab-btn.active { color: #fff; border-bottom-color: #4096ff; }
-
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
-
-  /* ── Route table ── */
-  .route-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .route-table thead tr { background: #fafafa; border-bottom: 2px solid #e8e8e8; }
-  .route-table thead th { padding: 10px 14px; text-align: left; font-weight: 600; color: #555; white-space: nowrap; }
-  .route-table thead th.num { text-align: right; }
-  .route-table tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.15s; }
-  .route-table tbody tr:hover { background: #f0fffe; }
-  .route-table tbody td { padding: 10px 14px; vertical-align: middle; text-align: left; }
-  .route-table tbody td.num { text-align: right; font-weight: 700; color: #13c2c2; }
-  .route-table tbody td.bags { text-align: right; color: #555; }
-  .model-tags { display: flex; flex-wrap: wrap; gap: 5px; }
-  .model-tag {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: #f0fffe; border: 1px solid #b5f5ec;
-    border-radius: 4px; padding: 2px 8px; font-size: 12px;
-  }
-  .model-tag .lap-cnt { font-weight: 700; color: #13c2c2; }
-  .model-tag .veh-list { color: #888; font-size: 11px; }
-
-  /* ── Footer ── */
-  .footer {
-    text-align: center;
-    color: #bbb;
-    font-size: 12px;
-    padding: 16px;
-    margin-top: 8px;
-  }
-
-  /* ── Refresh button ── */
-  .refresh-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 7px 18px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-top: 6px;
-    letter-spacing: 0.5px;
-  }
-  .refresh-btn:hover:not(:disabled) {
-    background: rgba(255,255,255,0.2);
-    border-color: rgba(255,255,255,0.6);
-  }
-  .refresh-btn:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-  }
-  .refresh-btn .spin {
-    display: inline-block;
-    animation: spin 1s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  #refresh-status {
-    font-size: 11px;
-    color: #aaa;
-    margin-top: 4px;
-    min-height: 16px;
-    transition: color 0.3s;
-  }
-  #refresh-status.ok  { color: #73d13d; }
-  #refresh-status.err { color: #ff7875; }
+/* ── Footer ── */
+.footer {
+  text-align: center;
+  color: #bbb;
+  font-size: 12px;
+  padding: 16px;
+  margin-top: 8px;
+}
 </style>
 </head>
 <body>
@@ -253,622 +158,110 @@
 <div class="header">
   <div class="header-left">
     <h1>副驾DCT数据看板</h1>
-    <div class="subtitle">项目: Harz &nbsp;|&nbsp; 时间: 2026-06-01 → <span id="today"></span> &nbsp;|&nbsp; 筛选: 已准出</div>
+    <div class="subtitle">项目: Harz &nbsp;|&nbsp; 时间: 2026-06-01 → 今日 &nbsp;|&nbsp; 筛选: 已准出</div>
   </div>
   <div class="header-right">
-    <div class="badge">● 已准出</div><br>
-    <div class="updated">更新时间: <span id="updated"></span></div>
-    <button class="refresh-btn" id="refresh-btn" onclick="refreshData()">
-      <span id="refresh-icon">↻</span> 数据刷新
-    </button>
-    <div id="refresh-status"></div>
+    <div class="badge">● 已准出</div>
+    <div class="updated" id="updated">—</div>
   </div>
 </div>
 
-<!-- Tab bar -->
-<div class="tab-bar">
-  <button class="tab-btn active" id="tab-btn-vehicle" onclick="switchTab('vehicle')">按车型统计</button>
-  <button class="tab-btn" id="tab-btn-route" onclick="switchTab('route')">按路线统计</button>
-  <button class="tab-btn" id="tab-btn-daily" onclick="switchTab('daily')">每日车辆统计</button>
-</div>
+<div class="container">
 
-<!-- Tab 1：按车型统计 -->
-<div id="tab-vehicle" class="tab-panel active">
-  <div class="container">
-    <div class="summary-row" id="summary-cards"></div>
-    <div class="platform-section platform-st35">
-      <div class="platform-title">▌ ST35 平台 &nbsp;— 449_A1p0 / C590 / V174 / V178 / V520 / V540</div>
-      <div class="platform-body"><table id="table-st35"></table></div>
+  <div class="platform-section platform-st35">
+    <div class="platform-title">▌ ST35 平台 — 449_A1p0 / C590 / V174 / V178 / V520 / V540</div>
+    <div class="platform-body">
+      <table>
+        <thead>
+          <tr>
+            <th class="model-col">车型</th>
+            <th>采集包数</th>
+            <th>有效包数</th>
+            <th>完成进度<span style="font-weight:400;color:#999;font-size:11px;margin-left:4px">(目标 20,000)</span></th>
+          </tr>
+        </thead>
+        <tbody id="st35-body"></tbody>
+      </table>
     </div>
-    <div class="platform-section platform-st3">
-      <div class="platform-title">▌ ST3 平台 &nbsp;— C167 / T167 / X167 / X167_Maybach / V167 / V223M / Z223M / V206M</div>
-      <div class="platform-body"><table id="table-st3"></table></div>
-    </div>
-    <div class="footer">数据来源: fst.momenta.works &nbsp;|&nbsp; 多人校准 = second_calibration &nbsp;|&nbsp; 训练可用 = 多人校准 ∩ DLP过滤（filtered_dlp_dataset_by_route，排除 UNKNOWN 路线）</div>
   </div>
-</div>
 
-<!-- Tab 2：按路线统计 -->
-<div id="tab-route" class="tab-panel">
-  <div class="container">
-    <div id="route-summary-row" class="summary-row"></div>
-    <div class="platform-section" style="margin-bottom:32px">
-      <div class="platform-title" style="background:linear-gradient(90deg,#13c2c2,#36cfc9)">▌ 路线 Bag 统计 &nbsp;— 按路线汇总圈数与采集数量</div>
-      <div class="platform-body">
-        <div id="route-table-wrap" style="padding:0">
-          <div style="padding:40px;text-align:center;color:#bbb">加载中…</div>
-        </div>
-      </div>
+  <div class="platform-section platform-st3">
+    <div class="platform-title">▌ ST3 平台 — C167 / T167 / X167 / X167_Maybach / V167 / V223M / Z223M / V206M</div>
+    <div class="platform-body">
+      <table>
+        <thead>
+          <tr>
+            <th class="model-col">车型</th>
+            <th>采集包数</th>
+            <th>有效包数</th>
+            <th>完成进度<span style="font-weight:400;color:#999;font-size:11px;margin-left:4px">(目标 20,000)</span></th>
+          </tr>
+        </thead>
+        <tbody id="st3-body"></tbody>
+      </table>
     </div>
-    <div class="footer">数据来源: fst.momenta.works &nbsp;|&nbsp; 圈数 = child_plan 数（SH_S_GT 按天去重）&nbsp;|&nbsp; 采集数量 = copilot_ss_bag_count</div>
   </div>
+
 </div>
 
-<!-- Tab 3：每日车辆统计 -->
-<div id="tab-daily" class="tab-panel">
-  <div class="container">
-
-    <!-- 日期选择控制条 -->
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;
-                background:#fff;border-radius:8px;padding:14px 20px;
-                box-shadow:0 2px 8px rgba(0,0,0,0.07)">
-      <span style="font-size:13px;color:#555;font-weight:600;white-space:nowrap">选择日期</span>
-      <input type="date" id="daily-date-input"
-             style="border:1.5px solid #d9d9d9;border-radius:6px;padding:6px 12px;
-                    font-size:13px;color:#333;outline:none;cursor:pointer"
-             onchange="onDailyDateChange()" />
-      <button onclick="queryDailyByDate()"
-              style="background:#1677ff;color:#fff;border:none;border-radius:6px;
-                     padding:7px 20px;font-size:13px;font-weight:600;cursor:pointer;
-                     white-space:nowrap">查询</button>
-      <span id="daily-query-status" style="font-size:12px;color:#8c8c8c"></span>
-    </div>
-
-    <div class="summary-row" id="daily-summary-row"></div>
-
-    <div class="platform-section" style="margin-bottom:32px">
-      <div class="platform-title" style="background:linear-gradient(90deg,#fa8c16,#ffa940)">
-        ▌ 每日车辆统计 &nbsp;— <span id="daily-date-label">今日</span> &nbsp;有效任务（包数/校准仅统计已准出）
-      </div>
-      <div class="platform-body">
-        <div id="daily-table-wrap" style="padding:0">
-          <div style="padding:40px;text-align:center;color:#bbb">请选择日期后点击查询</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="footer">数据来源: fst.momenta.works &nbsp;|&nbsp; 采集包 = copilot_ss_bag_count &nbsp;|&nbsp; 筛选: is_cert=true &amp; is_valid=true &nbsp;|&nbsp; 历史日期查询结果自动缓存</div>
-  </div>
-</div>
+<div class="footer">数据来源: fst.momenta.works &nbsp;|&nbsp; 有效包数 = 多人校准合格率 × 采集包数（filtered_dlp_dataset_by_route）</div>
 
 <script>
-// ── DATA ──────────────────────────────────────────────────────────────────────
-const PLATFORMS = [
-  { id: 'st35', name: 'ST35', vehicles: [
-    { model: '449_A1p0',    sc: { vg:0,   good:788,  bad:37,  unk:4  }, dlp: { vg:0,  good:771,  bad:33,  unk:4  } },
-    { model: 'C590',        sc: null,                                    dlp: null },
-    { model: 'V174',        sc: { vg:3,   good:1908, bad:87,  unk:40 }, dlp: { vg:1,  good:1522, bad:60,  unk:34 } },
-    { model: 'V178',        sc: { vg:0,   good:322,  bad:26,  unk:2  }, dlp: { vg:0,  good:320,  bad:23,  unk:2  } },
-    { model: 'V520',        sc: null,                                    dlp: null },
-    { model: 'V540',        sc: { vg:9,   good:2110, bad:122, unk:13 }, dlp: { vg:9,  good:1841, bad:92,  unk:20 } },
-  ]},
-  { id: 'st3', name: 'ST3', vehicles: [
-    { model: 'C167',        sc: null, dlp: null },
-    { model: 'T167',        sc: null, dlp: null },
-    { model: 'X167',        sc: null, dlp: null },
-    { model: 'X167_Maybach',sc: null, dlp: null },
-    { model: 'V167',        sc: null, dlp: null },
-    { model: 'V223M',       sc: { vg:0,  good:875,  bad:47,  unk:4  }, dlp: { vg:0,  good:692,  bad:39,  unk:4  } },
-    { model: 'Z223M',       sc: { vg:1,  good:183,  bad:50,  unk:199}, dlp: { vg:1,  good:173,  bad:25,  unk:0  } },
-    { model: 'V206M',       sc: null, dlp: null },
-  ]},
-];  // last updated 2026-06-06
-const LAST_UPDATED = '2026-06-06 (auto)';  // patched by update script
+const ST35 = ["449_A1p0","C590","V174","V178","V520","V540"];
+const ST3  = ["C167","T167","X167","X167_Maybach","V167","V223M","Z223M","V206M"];
+const TARGET = 20000;
 
-// ── HELPERS ───────────────────────────────────────────────────────────────────
-const fmt = n => n === 0 ? '<span style="color:#d9d9d9">0</span>' : n.toLocaleString();
-const fmtBold = n => n === 0 ? '<span style="color:#d9d9d9">0</span>' : `<b>${n.toLocaleString()}</b>`;
-
-function bar(d, h=8) {
-  if (!d) return `<div class="bar-wrap" style="height:${h}px"><div class="bar-none" style="width:100%"></div></div>`;
-  const total = d.vg + d.good + d.bad + d.unk;
-  if (total === 0) return `<div class="bar-wrap" style="height:${h}px"><div class="bar-none" style="width:100%"></div></div>`;
-  const p = k => (d[k] / total * 100).toFixed(1);
-  return `<div class="bar-wrap" style="height:${h}px">
-    <div class="bar-vg"   style="width:${p('vg')}%"></div>
-    <div class="bar-good" style="width:${p('good')}%"></div>
-    <div class="bar-bad"  style="width:${p('bad')}%"></div>
-    <div class="bar-unk"  style="width:${p('unk')}%"></div>
-  </div>`;
-}
-
-function addCounts(acc, d) {
-  if (!d) return;
-  acc.vg   += d.vg;
-  acc.good += d.good;
-  acc.bad  += d.bad;
-  acc.unk  += d.unk;
-}
-
-// ── TABLE BUILD ───────────────────────────────────────────────────────────────
-function buildTable(platform) {
-  const sc_total  = {vg:0, good:0, bad:0, unk:0};
-  const dlp_total = {vg:0, good:0, bad:0, unk:0};
-  let bags_total  = 0;
-  platform.vehicles.forEach(v => { addCounts(sc_total, v.sc); addCounts(dlp_total, v.dlp); bags_total += (v.bags||0); });
-
-  const THEAD = `<thead>
-    <tr>
-      <th class="model-col" rowspan="2">车型</th>
-      <th rowspan="2" style="text-align:center;color:#52c41a;white-space:nowrap">采集包数<br><span style="font-size:10px;color:#999;font-weight:400">UNP/HNP·已准出</span></th>
-      <th colspan="5" class="group-header">多人校准数据量（second_calibration）</th>
-      <th class="sep-col" rowspan="2"></th>
-      <th colspan="5" class="group-header">训练可用数据量（filtered_dlp_dataset）</th>
-    </tr>
-    <tr class="sub-header">
-      <th>Very_good</th><th>Good</th><th>Bad</th><th>Unknown</th><th class="bar-cell">分布</th>
-      <th>Very_good</th><th>Good</th><th>Bad</th><th>Unknown</th><th class="bar-cell">分布</th>
-    </tr>
-  </thead>`;
-
-  const fmtBags = n => n > 0
-    ? `<span style="color:#52c41a;font-weight:600">${n.toLocaleString()}</span>`
-    : `<span style="color:#d9d9d9">0</span>`;
-
-  let rows = '';
-  platform.vehicles.forEach(v => {
-    if (!v.sc && !v.dlp) {
-      rows += `<tr class="no-data">
-        <td class="model-col">${v.model}</td>
-        <td style="text-align:center">${fmtBags(v.bags||0)}</td>
-        <td colspan="5" style="color:#ccc;font-style:italic;text-align:center">暂无数据</td>
-        <td class="sep-col"></td>
-        <td colspan="5" style="color:#ccc;font-style:italic;text-align:center">暂无数据</td>
-      </tr>`;
-    } else {
-      const sc  = v.sc  || {vg:0,good:0,bad:0,unk:0};
-      const dlp = v.dlp || {vg:0,good:0,bad:0,unk:0};
-      rows += `<tr>
-        <td class="model-col">${v.model}</td>
-        <td style="text-align:center">${fmtBags(v.bags||0)}</td>
-        <td class="vg">${fmt(sc.vg)}</td>
-        <td class="good">${fmt(sc.good)}</td>
-        <td class="bad">${fmt(sc.bad)}</td>
-        <td class="unk">${fmt(sc.unk)}</td>
-        <td class="bar-cell">${bar(sc)}</td>
-        <td class="sep-col"></td>
-        <td class="vg">${fmt(dlp.vg)}</td>
-        <td class="good">${fmt(dlp.good)}</td>
-        <td class="bad">${fmt(dlp.bad)}</td>
-        <td class="unk">${fmt(dlp.unk)}</td>
-        <td class="bar-cell">${bar(dlp)}</td>
-      </tr>`;
-    }
-  });
-
-  // Total row
-  rows += `<tr class="total-row">
-    <td class="model-col">合计</td>
-    <td style="text-align:center"><b style="color:#52c41a">${bags_total.toLocaleString()}</b></td>
-    <td class="vg">${fmtBold(sc_total.vg)}</td>
-    <td class="good">${fmtBold(sc_total.good)}</td>
-    <td class="bad">${fmtBold(sc_total.bad)}</td>
-    <td class="unk">${fmtBold(sc_total.unk)}</td>
-    <td class="bar-cell">${bar(sc_total)}</td>
-    <td class="sep-col"></td>
-    <td class="vg">${fmtBold(dlp_total.vg)}</td>
-    <td class="good">${fmtBold(dlp_total.good)}</td>
-    <td class="bad">${fmtBold(dlp_total.bad)}</td>
-    <td class="unk">${fmtBold(dlp_total.unk)}</td>
-    <td class="bar-cell">${bar(dlp_total)}</td>
-  </tr>`;
-
-  document.getElementById(`table-${platform.id}`).innerHTML = THEAD + `<tbody>${rows}</tbody>`;
-  return { sc: sc_total, dlp: dlp_total, bags: bags_total };
-}
-
-// ── SUMMARY CARDS ─────────────────────────────────────────────────────────────
-function buildSummaryCards(totals) {
-  // 采集包数卡片（独立样式，只显示总数）
-  const bagsCard = `<div class="summary-card" style="border-left-color:#52c41a;min-width:180px">
-    <h3>累计采集包数（UNP/HNP · 全车型）</h3>
-    <div class="quality-row">
-      <div class="q-item" style="text-align:center">
-        <div class="q-label">总包数</div>
-        <div class="q-value" style="color:#52c41a;font-size:28px;font-weight:700">${totals.bags.toLocaleString()}</div>
-      </div>
+function progressCell(eff) {
+  if (!eff) return `<td class="td-progress"><span style="color:#cbd5e1">—</span></td>`;
+  const pct = Math.min(eff / TARGET * 100, 100);
+  const cls = pct >= 100 ? '' : pct >= 50 ? 'warn' : 'low';
+  return `<td class="td-progress">
+    <div class="progress-wrap">
+      <div class="progress-bar-bg"><div class="progress-bar-fill ${cls}" style="width:${pct.toFixed(1)}%"></div></div>
+      <span class="progress-pct ${cls}">${pct.toFixed(1)}%</span>
     </div>
-  </div>`;
-
-  const cards = [
-    { title: '多人校准数据量（全部车型汇总）', desc: '', d: totals.sc, border: '#1677ff' },
-    { title: '训练可用数据量（全部车型汇总）', desc: '多人校准 ∩ DLP 过滤后的数据 — 真正可送入模型训练的数据量', d: totals.dlp, border: '#722ed1' },
-  ];
-  const otherCards = cards.map(c => {
-    const total = c.d.vg + c.d.good + c.d.bad + c.d.unk;
-    const p = k => total ? (c.d[k] / total * 100).toFixed(1) : 0;
-    return `<div class="summary-card" style="border-left-color:${c.border}">
-      <h3>${c.title}</h3>
-      ${c.desc ? `<div style="font-size:11px;color:#888;margin:-6px 0 10px;line-height:1.5">${c.desc}</div>` : ''}
-      <div class="quality-row">
-        <div class="q-item qvg"><div class="q-label">Very_good</div><div class="q-value">${c.d.vg.toLocaleString()}</div></div>
-        <div class="q-item qgood"><div class="q-label">Good</div><div class="q-value">${c.d.good.toLocaleString()}</div></div>
-        <div class="q-item qbad"><div class="q-label">Bad</div><div class="q-value">${c.d.bad.toLocaleString()}</div></div>
-        <div class="q-item qunk"><div class="q-label">Unknown</div><div class="q-value">${c.d.unk.toLocaleString()}</div></div>
-        <div style="flex:1;margin-left:16px">
-          <div style="font-size:11px;color:#999;margin-bottom:4px">总计: ${total.toLocaleString()}</div>
-          ${bar(c.d, 10)}
-          <div style="font-size:11px;color:#999;margin-top:4px">
-            VG ${p('vg')}% / Good ${p('good')}% / Bad ${p('bad')}% / Unk ${p('unk')}%
-          </div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-  document.getElementById('summary-cards').innerHTML = bagsCard + otherCards;
+  </td>`;
 }
 
-// ── RENDER ────────────────────────────────────────────────────────────────────
-function render(platforms) {
-  const grand_sc  = {vg:0, good:0, bad:0, unk:0};
-  const grand_dlp = {vg:0, good:0, bad:0, unk:0};
-  let grand_bags  = 0;
-  platforms.forEach(p => {
-    const totals = buildTable(p);
-    addCounts(grand_sc,  totals.sc);
-    addCounts(grand_dlp, totals.dlp);
-    grand_bags += totals.bags;
+function renderTable(tbodyId, models, data) {
+  const tbody = document.getElementById(tbodyId);
+  let totBags = 0, totEff = 0;
+  models.forEach(m => {
+    const sc = data[m] || {};
+    const bags = sc.bags || 0;
+    const eff  = sc.effective_bags || 0;
+    totBags += bags;
+    totEff  += eff;
+    const tr = document.createElement('tr');
+    const bagsCell = bags > 0
+      ? `<td class="td-bags">${bags.toLocaleString()}</td>`
+      : `<td style="color:#d9d9d9;text-align:center">0</td>`;
+    const effCell = eff > 0
+      ? `<td class="td-good">${eff.toLocaleString()}</td>`
+      : `<td style="color:#d9d9d9;text-align:center">—</td>`;
+    tr.innerHTML = `<td class="model-col">${m}</td>` + bagsCell + effCell + progressCell(eff);
+    tbody.appendChild(tr);
   });
-  buildSummaryCards({ sc: grand_sc, dlp: grand_dlp, bags: grand_bags });
+  const tr = document.createElement('tr');
+  tr.className = 'total-row';
+  tr.innerHTML = `<td class="model-col">合计</td>`
+    + `<td class="td-bags">${totBags.toLocaleString()}</td>`
+    + `<td class="td-good">${totEff.toLocaleString()}</td>`
+    + `<td></td>`;
+  tbody.appendChild(tr);
 }
 
-// ── TRANSFORM API → PLATFORMS FORMAT ─────────────────────────────────────────
-function transformApiData(apiData) {
-  const raw = apiData.data;
-  const ST35_MODELS = ["449_A1p0","C590","V174","V178","V520","V540"];
-  const ST3_MODELS  = ["C167","T167","X167","X167_Maybach","V167","V223M","Z223M","V206M"];
-
-  const toVehicle = (model) => {
-    const d = raw[model];
-    if (!d) return { model, sc: null, dlp: null };
-    const cvt = (s) => {
-      if (!s) return null;
-      const total = s.very_good + s.good + s.bad + s.unknown;
-      if (total === 0) return null;
-      return { vg: s.very_good, good: s.good, bad: s.bad, unk: s.unknown };
-    };
-    return { model, sc: cvt(d.sc), dlp: cvt(d.dlp), bags: d.bags || 0 };
-  };
-
-  return [
-    { id: 'st35', name: 'ST35', vehicles: ST35_MODELS.map(toVehicle) },
-    { id: 'st3',  name: 'ST3',  vehicles: ST3_MODELS.map(toVehicle)  },
-  ];
-}
-
-// ── COOLDOWN ──────────────────────────────────────────────────────────────────
-const COOLDOWN_MS = 10 * 60 * 1000; // 10 分钟
-const LS_KEY = 'dct_last_refresh';
-let lastRefreshTime = parseInt(localStorage.getItem(LS_KEY) || '0');
-
-function showToast(msg) {
-  let toast = document.getElementById('toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'toast';
-    toast.style.cssText = `
-      position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.85);
-      background:rgba(20,20,35,0.96); color:#fff; padding:28px 36px;
-      border-radius:14px; font-size:16px; font-weight:600; text-align:center;
-      box-shadow:0 8px 40px rgba(0,0,0,0.45); z-index:9999; line-height:1.7;
-      border:1px solid rgba(255,255,255,0.1); max-width:320px;
-      opacity:0; transition:opacity 0.2s, transform 0.2s;
-    `;
-    document.body.appendChild(toast);
-  }
-  toast.innerHTML = msg;
-  // force reflow then animate in
-  toast.offsetHeight;
-  toast.style.opacity = '1';
-  toast.style.transform = 'translate(-50%,-50%) scale(1)';
-  clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translate(-50%,-50%) scale(0.85)';
-  }, 3500);
-}
-
-// ── REFRESH ───────────────────────────────────────────────────────────────────
-async function refreshData() {
-  const now_ms = Date.now();
-  const btn    = document.getElementById('refresh-btn');
-  const icon   = document.getElementById('refresh-icon');
-  const status = document.getElementById('refresh-status');
-
-  btn.disabled = true;
-  icon.className = 'spin';
-  icon.textContent = '↻';
-  status.className = '';
-  status.textContent = '正在登录 FST，约需 20 秒…';
-
-  try {
-    const r = await fetch('/api/refresh');
-    const data = await r.json();
-    if (data.error) throw new Error(data.error);
-
-    const platforms = transformApiData(data);
-    render(platforms);
-    document.getElementById('updated').textContent = data.updated;
-    lastRefreshTime = Date.now();
-    localStorage.setItem(LS_KEY, lastRefreshTime);
-
-    _routeLoaded = false;
-    _dailyLoaded = false;
-    if (sessionStorage.getItem('dct_tab') === 'daily') loadDailyTab();
-    status.className = 'ok';
-    status.textContent = '✓ 已更新: ' + data.updated;
-    if (sessionStorage.getItem('dct_tab') === 'route') loadRouteTab();
-  } catch (e) {
-    status.className = 'err';
-    status.textContent = '✗ 刷新失败: ' + e.message;
-  } finally {
-    btn.disabled = false;
-    icon.className = '';
-    icon.textContent = '↻';
-    setTimeout(() => { status.className = ''; status.textContent = ''; }, 6000);
-  }
-}
-
-// ── ROUTE TAB ─────────────────────────────────────────────────────────────────
-let _routeLoaded = false;
-
-function buildRouteTable(routeData) {
-  const routes = routeData.routes || [];
-
-  // Summary card
-  const totalLaps = routes.reduce((s, r) => s + r.laps, 0);
-  const totalBags = routes.reduce((s, r) => s + r.bag_cnt, 0);
-  const uniqueRoutes = routes.filter(r => r.route !== 'UNKNOWN').length;
-  const totalGood = routes.reduce((s, r) => s + (r.good_cnt || 0), 0);
-  document.getElementById('route-summary-row').innerHTML = `
-    <div class="summary-card" style="border-left-color:#13c2c2">
-      <h3>路线总览（全部路线汇总）</h3>
-      <div class="quality-row">
-        <div class="q-item"><div class="q-label">路线数</div><div class="q-value" style="color:#13c2c2">${uniqueRoutes}</div></div>
-        <div class="q-item"><div class="q-label">总圈数</div><div class="q-value" style="color:#52c41a">${totalLaps.toLocaleString()}</div></div>
-        <div class="q-item"><div class="q-label">采集数量</div><div class="q-value" style="color:#555;font-size:18px">${totalBags.toLocaleString()}</div></div>
-        <div class="q-item"><div class="q-label">好数据量（V.Good+Good）</div><div class="q-value" style="color:#1677ff;font-size:18px">${totalGood.toLocaleString()}</div></div>
-      </div>
-    </div>`;
-
-  // Table
-  const numCell = (n) => n > 0 ? n.toLocaleString() : '<span style="color:#d9d9d9">—</span>';
-  const rows = routes.map(r => {
-    const modelTags = Object.entries(r.models)
-      .sort((a, b) => b[1].laps - a[1].laps)
-      .map(([model, info]) =>
-        `<span class="model-tag">
-          <span class="lap-cnt">${model} ×${info.laps}</span>
-          <span class="veh-list">(${info.vehicles.join(', ')})</span>
-        </span>`
-      ).join('');
-    return `<tr>
-      <td style="font-weight:600;color:#333;white-space:nowrap">${r.route}</td>
-      <td class="num">${r.laps}</td>
-      <td class="bags">${numCell(r.bag_cnt)}</td>
-      <td class="bags" style="color:#1677ff">${numCell(r.good_cnt || 0)}</td>
-      <td><div class="model-tags">${modelTags}</div></td>
-    </tr>`;
-  }).join('');
-
-  document.getElementById('route-table-wrap').innerHTML = `
-    <table class="route-table">
-      <thead><tr>
-        <th>路线名称</th>
-        <th class="num">圈数</th>
-        <th class="num">采集数量</th>
-        <th class="num">好数据量</th>
-        <th>各车型（圈数 / 车辆号）</th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
-}
-
-async function loadRouteTab() {
-  if (_routeLoaded) return;
-  try {
-    const r = await fetch('/api/routes');
-    if (r.ok) {
-      const data = await r.json();
-      if (data && data.routes) {
-        buildRouteTable(data);
-        _routeLoaded = true;
-        return;
-      }
-    }
-  } catch(e) {}
-  document.getElementById('route-table-wrap').innerHTML =
-    '<div style="padding:40px;text-align:center;color:#bbb">暂无数据，请先点击"数据刷新"</div>';
-}
-
-// ── DAILY TAB ─────────────────────────────────────────────────────────────────
-let _dailyLoaded = false;
-let _dailyQuerying = false;
-
-function buildDailyTable(data) {
-  const vehicles = data.vehicles || [];
-  const dateLabel = data.date || '—';
-  document.getElementById('daily-date-label').textContent = dateLabel;
-
-  const totalVehicles = vehicles.length;
-  const totalBags  = vehicles.reduce((s, v) => s + v.bags, 0);
-  const totalTasks = vehicles.reduce((s, v) => s + v.task_count, 0);
-  document.getElementById('daily-summary-row').innerHTML = `
-    <div class="summary-card" style="border-left-color:#fa8c16">
-      <h3>车辆统计 — ${dateLabel} &nbsp;有效任务（包数/校准仅统计已准出）</h3>
-      <div class="quality-row">
-        <div class="q-item"><div class="q-label">出车数</div><div class="q-value" style="color:#fa8c16">${totalVehicles}</div></div>
-        <div class="q-item"><div class="q-label">总采集包</div><div class="q-value" style="color:#52c41a">${totalBags.toLocaleString()}</div></div>
-        <div class="q-item"><div class="q-label">任务数</div><div class="q-value" style="color:#1677ff">${totalTasks}</div></div>
-      </div>
-    </div>`;
-
-  if (!vehicles.length) {
-    document.getElementById('daily-table-wrap').innerHTML =
-      '<div style="padding:40px;text-align:center;color:#bbb">该日期暂无数据</div>';
-    return;
-  }
-
-  const rows = vehicles.map((v, i) => {
-    const drivers  = v.drivers.join(' / ')  || '—';
-    const copilots = v.copilots.join(' / ') || '—';
-    return `<tr>
-      <td style="text-align:center;color:#8c8c8c;font-size:12px">${i + 1}</td>
-      <td style="font-weight:700;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.vehicle}</td>
-      <td style="color:#1677ff;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.car_type}</td>
-      <td style="color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${drivers}</td>
-      <td style="color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${copilots}</td>
-      <td style="text-align:right;font-weight:700;color:#52c41a;font-size:15px">${v.bags.toLocaleString()}</td>
-      <td style="text-align:right;color:#13c2c2;font-weight:600">${(v.sc||0).toLocaleString()}</td>
-      <td style="text-align:right;color:#1677ff;font-weight:600">${(v.dlp||0).toLocaleString()}</td>
-      <td style="text-align:right;color:#8c8c8c">${v.task_count}</td>
-    </tr>`;
-  }).join('');
-
-  const totalSc   = vehicles.reduce((s, v) => s + (v.sc  || 0), 0);
-  const totalDlp  = vehicles.reduce((s, v) => s + (v.dlp || 0), 0);
-  const totalRow = `<tr style="background:#f5f5f5;border-top:2px solid #ddd;font-weight:700">
-    <td></td>
-    <td colspan="4" style="color:#333">当日合计</td>
-    <td style="text-align:right;color:#52c41a;font-size:15px">${totalBags.toLocaleString()}</td>
-    <td style="text-align:right;color:#13c2c2">${totalSc.toLocaleString()}</td>
-    <td style="text-align:right;color:#1677ff">${totalDlp.toLocaleString()}</td>
-    <td style="text-align:right;color:#555">${totalTasks}</td>
-  </tr>`;
-
-  document.getElementById('daily-table-wrap').innerHTML = `
-    <table class="route-table" style="table-layout:fixed;width:100%">
-      <colgroup>
-        <col style="width:40px">
-        <col style="width:150px">
-        <col style="width:110px">
-        <col style="width:110px">
-        <col style="width:110px">
-        <col style="width:90px">
-        <col style="width:100px">
-        <col style="width:100px">
-        <col style="width:60px">
-      </colgroup>
-      <thead><tr>
-        <th style="text-align:center">#</th>
-        <th>车辆号</th>
-        <th>车型</th>
-        <th>主驾</th>
-        <th>副驾</th>
-        <th class="num">采集包数</th>
-        <th class="num">多人校准</th>
-        <th class="num">取交集</th>
-        <th class="num">任务数</th>
-      </tr></thead>
-      <tbody>${rows}${totalRow}</tbody>
-    </table>`;
-}
-
-function onDailyDateChange() {
-  // reset status when date changes
-  document.getElementById('daily-query-status').textContent = '';
-}
-
-async function queryDailyByDate() {
-  if (_dailyQuerying) return;
-  const dateInput = document.getElementById('daily-date-input');
-  const date = dateInput.value;
-  if (!date) { dateInput.focus(); return; }
-
-  const status = document.getElementById('daily-query-status');
-  _dailyQuerying = true;
-  status.style.color = '#8c8c8c';
-  status.textContent = '查询中，首次需要登录 FST，约需 30 秒…';
-  document.getElementById('daily-table-wrap').innerHTML =
-    '<div style="padding:40px;text-align:center;color:#bbb">加载中…</div>';
-
-  try {
-    const r = await fetch('/api/daily?date=' + date);
-    const data = await r.json();
-    if (data.error) throw new Error(data.error);
-    buildDailyTable(data);
-    _dailyLoaded = true;
-    status.style.color = '#52c41a';
-    status.textContent = '✓ ' + (data.updated || date);
-  } catch(e) {
-    status.style.color = '#ff4d4f';
-    status.textContent = '✗ ' + e.message;
-    document.getElementById('daily-table-wrap').innerHTML =
-      `<div style="padding:40px;text-align:center;color:#ff4d4f">${e.message}</div>`;
-  } finally {
-    _dailyQuerying = false;
-  }
-}
-
-async function loadDailyTab() {
-  // 初始化日期选择器为今天，不自动加载（让用户主动选日期查询）
-  const input = document.getElementById('daily-date-input');
-  const todayStr = new Date().toISOString().slice(0, 10);
-  input.value = todayStr;
-  input.max   = todayStr;
-  if (_dailyLoaded) return;
-  // 尝试加载今天缓存，有就直接渲染
-  try {
-    const r = await fetch('/api/daily?date=' + todayStr);
-    if (r.ok) {
-      const data = await r.json();
-      if (data && data.vehicles) {
-        buildDailyTable(data);
-        _dailyLoaded = true;
-        document.getElementById('daily-query-status').textContent = '已加载缓存';
-        return;
-      }
-    }
-  } catch(e) {}
-  document.getElementById('daily-table-wrap').innerHTML =
-    '<div style="padding:40px;text-align:center;color:#bbb">请选择日期后点击查询<br><span style="font-size:12px">今日数据需先点击右上角"数据刷新"</span></div>';
-}
-
-// ── TABS ──────────────────────────────────────────────────────────────────────
-function switchTab(name) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  document.getElementById('tab-btn-' + name).classList.add('active');
-  sessionStorage.setItem('dct_tab', name);
-  if (name === 'route')  loadRouteTab();
-  if (name === 'daily')  loadDailyTab();
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────────
-const now = new Date();
-document.getElementById('today').textContent = now.toISOString().slice(0,10);
-
-(async function init() {
-  try {
-    const r = await fetch('/api/data');
-    if (r.ok) {
-      const data = await r.json();
-      if (data && data.data) {
-        render(transformApiData(data));
-        document.getElementById('updated').textContent = data.updated || LAST_UPDATED;
-        const savedTab = sessionStorage.getItem('dct_tab');
-        if (savedTab && savedTab !== 'vehicle') switchTab(savedTab);
-        return;
-      }
-    }
-  } catch(e) {}
-  // 无缓存时 fallback 到编译时的静态数据
-  document.getElementById('updated').textContent = LAST_UPDATED;
-  render(PLATFORMS);
-  const savedTab = sessionStorage.getItem('dct_tab');
-  if (savedTab && savedTab !== 'vehicle') switchTab(savedTab);
-})();
+fetch('dct_data.json?_=' + Date.now())
+  .then(r => r.json())
+  .then(d => {
+    document.getElementById('updated').textContent = '更新时间: ' + (d.updated || '—');
+    const models = d.models || {};
+    renderTable('st35-body', ST35, models);
+    renderTable('st3-body',  ST3,  models);
+  })
+  .catch(() => {
+    document.getElementById('updated').textContent = '数据加载失败';
+  });
 </script>
 </body>
 </html>
